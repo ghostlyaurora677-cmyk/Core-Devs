@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BotInfo } from '../types';
 
@@ -10,7 +9,7 @@ interface BotCardProps {
 const BotCard: React.FC<BotCardProps> = ({ bot, onViewDetails }) => {
   return (
     <div 
-      className="group relative overflow-hidden rounded-[2.5rem] glass p-10 card-highlight cursor-pointer border-white/5 hover:border-indigo-500/30 transition-all duration-500"
+      className="reveal group relative overflow-hidden rounded-[2.5rem] glass p-10 card-highlight cursor-pointer border-white/5 hover:border-indigo-500/30 transition-all duration-500"
       onClick={() => onViewDetails(bot)}
     >
       <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.07] transition-all duration-700 select-none">

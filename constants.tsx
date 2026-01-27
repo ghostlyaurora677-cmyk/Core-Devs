@@ -1,12 +1,11 @@
-
 import { BotInfo, Resource } from './types';
 
 export const BOTS: BotInfo[] = [
   {
-    id: 'fynex',
-    name: 'Fynex Music',
+    id: 'coredevs-music',
+    name: 'CoreDevs Music',
     tagline: 'High-Fidelity Audio',
-    description: 'Elevate your server voice channels with crystal clear 24/7 music. Supporting all major platforms with advanced DSP filters and zero-buffering technology.',
+    description: 'The ultimate Discord music solution. Supporting all major platforms with advanced DSP filters, zero-buffering technology, and crystal clear 320kbps audio.',
     imageUrl: 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=400&h=400&fit=crop',
     bannerUrl: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=1200&h=400&fit=crop',
     color: '#5865F2',
@@ -71,23 +70,5 @@ export const INITIAL_RESOURCES: Resource[] = [
     content: 'AIzaSyA-coredevs-vault-flash-9911',
     tags: ['Google', 'Gemini', 'AI'],
     createdAt: '2024-06-10'
-  },
-  {
-    id: 'r4',
-    title: 'Discord Embed Generator',
-    description: 'Proprietary web-based utility for designing complex rich embeds for your bots.',
-    type: 'TOOL',
-    content: 'https://coredevs.hub/tools/embed-builder',
-    tags: ['Design', 'UI', 'Utility'],
-    createdAt: '2024-06-15'
-  },
-  {
-    id: 'r5',
-    title: 'Token Validator CLI',
-    description: 'Quickly check the validity of Discord tokens without getting ratelimited.',
-    type: 'TOOL',
-    content: 'https://coredevs.hub/tools/validator',
-    tags: ['Security', 'Auth', 'CLI'],
-    createdAt: '2024-06-20'
   }
 ];

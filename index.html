@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Core Devs | Premium Discord Hub</title>
     
-    <!-- 1. CRITICAL: Define process and global immediately -->
     <script>
         window.process = { 
             env: { API_KEY: "" },
@@ -27,6 +26,7 @@
             margin: 0;
             padding: 0;
             min-height: 100vh;
+            overflow-x: hidden;
         }
 
         .glass {
@@ -35,14 +35,31 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        .fade-in { animation: fadeIn 0.4s ease-in; }
+        /* Scroll Animations */
+        .reveal {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .reveal.active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .fade-in { animation: fadeIn 0.6s ease-out forwards; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
         ::-webkit-scrollbar { width: 6px; }
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+        
+        .glow { box-shadow: 0 0 20px rgba(88, 101, 242, 0.3); }
+
+        .stagger-1 { transition-delay: 0.1s; }
+        .stagger-2 { transition-delay: 0.2s; }
+        .stagger-3 { transition-delay: 0.3s; }
     </style>
 
-    <!-- 2. FIXED IMPORTMAP: Consistent 19.0.0 versions -->
     <script type="importmap">
 {
   "imports": {
@@ -58,7 +75,23 @@
 </head>
 <body>
     <div id="root"></div>
-    <!-- 3. CRITICAL: Actually load the app module -->
     <script type="module" src="./index.tsx"></script>
+    <script>
+        // Simple Intersection Observer for scroll animations
+        function reveal() {
+            var reveals = document.querySelectorAll(".reveal");
+            for (var i = 0; i < reveals.length; i++) {
+                var windowHeight = window.innerHeight;
+                var elementTop = reveals[i].getBoundingClientRect().top;
+                var elementVisible = 100;
+                if (elementTop < windowHeight - elementVisible) {
+                    reveals[i].classList.add("active");
+                }
+            }
+        }
+        window.addEventListener("scroll", reveal);
+        // Initial check
+        setTimeout(reveal, 500);
+    </script>
 </body>
 </html>

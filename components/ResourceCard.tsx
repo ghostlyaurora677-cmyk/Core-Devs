@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Resource } from '../types';
 import { explainCode } from '../services/geminiService';
@@ -32,10 +31,9 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
   };
 
   const typeIcon = resource.type === 'API_KEY' ? '🔑' : resource.type === 'CODE_SNIPPET' ? '💻' : '🛠️';
-  const typeColor = resource.type === 'API_KEY' ? 'amber' : resource.type === 'CODE_SNIPPET' ? 'indigo' : 'purple';
 
   return (
-    <div className="rounded-[2.5rem] glass p-8 flex flex-col h-full card-highlight shadow-xl overflow-hidden relative group/card">
+    <div className="reveal rounded-[2.5rem] glass p-8 flex flex-col h-full card-highlight shadow-xl overflow-hidden relative group/card">
       <div className={`absolute top-0 right-0 p-8 opacity-5 pointer-events-none group-hover/card:scale-125 group-hover/card:opacity-10 transition-all duration-700`}>
          <span className="text-7xl font-black">{typeIcon}</span>
       </div>
