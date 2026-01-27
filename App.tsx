@@ -23,7 +23,11 @@ const App: React.FC = () => {
   const [isSyncing, setIsSyncing] = useState(false);
   const [editingResource, setEditingResource] = useState<Resource | null>(null);
   const [isAdmin, setIsAdmin] = useState(() => {
-    return localStorage.getItem('cd_admin_session') === 'active';
+    try {
+      return localStorage.getItem('cd_admin_session') === 'active';
+    } catch {
+      return false;
+    }
   });
   
   const [formData, setFormData] = useState({
@@ -39,31 +43,58 @@ const App: React.FC = () => {
       const data = await databaseService.getResources();
       setResources(data);
     } catch (err) {
-      console.error("Failed to fetch initial resources:", err);
+      console.error("Failed to fetch resources:", err);
     } finally {
       setIsLoading(false);
     }
   };
 
+  // Fail-safe to prevent stuck black loading screen
   useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) entry.target.classList.add('active');
-      });
-    }, { threshold: 0.1 });
+    const timer = setTimeout(() => {
+      if (isLoading) {
+        console.warn("Loading taking too long, forcing app start...");
+        setIsLoading(false);
+      }
+    }, 4000);
+    return () => clearTimeout(timer);
+  }, [isLoading]);
 
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-    return () => observer.disconnect();
-  }, [view, isLoading]);
+  useEffect(() => {
+    fetchResources();
+  }, []);
+
+  // Improved Reveal Animation Logic
+  useEffect(() => {
+    if (isLoading) return;
+
+    const initObserver = () => {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('active');
+          }
+        });
+      }, { threshold: 0.05, rootMargin: '0px 0px -50px 0px' });
+
+      const elements = document.querySelectorAll('.reveal');
+      if (elements.length === 0) {
+        // Retry after a short delay if elements aren't rendered yet
+        setTimeout(initObserver, 100);
+        return;
+      }
+      elements.forEach(el => observer.observe(el));
+      return observer;
+    };
+
+    const obs = initObserver();
+    return () => obs?.disconnect();
+  }, [view, isLoading, resources]);
 
   useEffect(() => {
     if (theme === 'light') document.body.classList.add('light');
     else document.body.classList.remove('light');
   }, [theme]);
-
-  useEffect(() => {
-    fetchResources();
-  }, []);
 
   const toggleTheme = () => setTheme(prev => prev === 'light' ? 'dark' : 'light');
 
@@ -213,7 +244,7 @@ const App: React.FC = () => {
               </div>
               <div className="grid grid-cols-1 gap-12">
                 {BOTS.map((bot, index) => (
-                  <div key={bot.id} className="reveal" style={{ transitionDelay: `${index * 150}ms` }}>
+                  <div key={bot.id} className="reveal" style={{ transitionDelay: `${index * 100}ms` }}>
                     <BotCard bot={bot} onViewDetails={handleBotClick} />
                   </div>
                 ))}
@@ -284,7 +315,7 @@ const App: React.FC = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
               {filteredResources.length > 0 ? (
                 filteredResources.map((res, index) => (
-                  <div key={res.id} className="reveal" style={{ transitionDelay: `${index * 100}ms` }}>
+                  <div key={res.id} className="reveal" style={{ transitionDelay: `${index * 50}ms` }}>
                     <ResourceCard resource={res} />
                   </div>
                 ))
