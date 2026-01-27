@@ -5,41 +5,41 @@ export const BOTS: BotInfo[] = [
   {
     id: 'fynex',
     name: 'Fynex Music',
-    tagline: 'Crystal Clear Audio Experience',
-    description: 'The premier music solution for Discord. Support for Spotify, SoundCloud, and YouTube with zero-lag playback and advanced filters.',
+    tagline: 'High-Fidelity Audio',
+    description: 'Elevate your server voice channels with crystal clear 24/7 music. Supporting all major platforms with advanced DSP filters and zero-buffering technology.',
     imageUrl: 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=400&h=400&fit=crop',
     bannerUrl: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=1200&h=400&fit=crop',
     color: '#5865F2',
     stats: {
-      servers: '1.5k+',
-      users: '800k+',
-      commands: '40+'
+      servers: '12.4k',
+      users: '2.1M',
+      commands: '50+'
     },
-    inviteUrl: '#',
+    inviteUrl: 'https://discord.com',
     features: [
-      { title: 'Multi-Source', description: 'Play music from Spotify, Apple Music, and more.', icon: '🎵' },
-      { title: 'Audio Filters', description: 'Bassboost, Nightcore, and 8D audio effects.', icon: '🎛️' },
-      { title: '24/7 Mode', description: 'Keep the party going even when everyone leaves.', icon: '🌙' }
+      { title: 'Lossless Audio', description: 'Stream in 320kbps for the ultimate listening experience.', icon: '🔊' },
+      { title: 'Custom Playlists', description: 'Save and load your favorite tracks instantly.', icon: '📜' },
+      { title: 'Slash Commands', description: 'Modern, intuitive interface with full autocomplete support.', icon: '⚡' }
     ]
   },
   {
     id: 'ryzer',
-    name: 'Ryzer',
-    tagline: 'Your Server\'s Best Friend',
-    description: 'A powerful multipurpose bot designed to handle everything from advanced moderation and economy to leveling and games.',
+    name: 'Ryzer Pro',
+    tagline: 'All-in-One Powerhouse',
+    description: 'The ultimate multipurpose utility. From AI-driven moderation to a deep global economy system, Ryzer replaces 10 bots with a single, fast solution.',
     imageUrl: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=400&fit=crop',
     bannerUrl: 'https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?w=1200&h=400&fit=crop',
     color: '#10b981',
     stats: {
-      servers: '2.1k+',
-      users: '1.2M+',
-      commands: '120+'
+      servers: '8.2k',
+      users: '1.5M',
+      commands: '150+'
     },
-    inviteUrl: '#',
+    inviteUrl: 'https://discord.com',
     features: [
-      { title: 'Auto-Mod', description: 'AI-driven moderation to keep your server safe.', icon: '🛡️' },
-      { title: 'Economy', description: 'Global currency, shops, and daily rewards.', icon: '💰' },
-      { title: 'Giveaways', description: 'Host and manage giveaways effortlessly.', icon: '🎉' }
+      { title: 'AI Automod', description: 'Intelligent filtering that learns from your server context.', icon: '🛡️' },
+      { title: 'Global Economy', description: 'Compete across servers with levels, items, and shops.', icon: '📈' },
+      { title: 'Social Integration', description: 'Connect Twitter, Twitch, and YouTube alerts effortlessly.', icon: '🔗' }
     ]
   }
 ];
@@ -47,29 +47,47 @@ export const BOTS: BotInfo[] = [
 export const INITIAL_RESOURCES: Resource[] = [
   {
     id: 'r1',
-    title: 'GPT-4 Shared Key',
-    description: 'A shared developer token for GPT-4 API access. Please use responsibly.',
+    title: 'GPT-4o Developer Key',
+    description: 'Official shared access token for rapid prototyping. Limited to 50 requests per minute.',
     type: 'API_KEY',
-    content: 'sk-proj-coredevs-shared-v1-xxxxxxxxxxxxxxxxxxxx',
-    tags: ['AI', 'GPT4', 'Free'],
-    createdAt: '2024-05-20'
+    content: 'sk-proj-coredevs-vault-v2-4992-XXXX-8822',
+    tags: ['AI', 'OpenAI', 'Premium'],
+    createdAt: '2024-06-01'
   },
   {
     id: 'r2',
-    title: 'Advanced Discord Handler v14',
-    description: 'Boilerplate for building multi-command bots with event management.',
+    title: 'Node.js Discord.js Template',
+    description: 'Production-ready handler with sharding support and command autoloader.',
     type: 'CODE_SNIPPET',
-    content: '// CoreDevs Pro Handler\nconst { Client } = require("discord.js");\nconst client = new Client({ intents: 32767 });\n\nmodule.exports = async (dir) => {\n  // Logic for loading commands recursively\n  console.log("CoreDevs: All systems operational.");\n};',
-    tags: ['NodeJS', 'Discord.js', 'Source'],
-    createdAt: '2024-05-18'
+    content: 'const { Client, Collection } = require("discord.js");\nconst client = new Client({ intents: 32767 });\n\n// CoreDevs Advanced Loader\nclient.commands = new Collection();\nrequire("./handler")(client);\n\nclient.login(process.env.TOKEN);',
+    tags: ['NodeJS', 'DiscordJS', 'Boilerplate'],
+    createdAt: '2024-06-05'
   },
   {
     id: 'r3',
-    title: 'Gemini Pro API Token',
-    description: 'Global access token for Google Gemini Pro 1.5 flash-image models.',
+    title: 'Gemini Pro Access',
+    description: 'Global developer key for Google Gemini Pro 1.5 Flash models.',
     type: 'API_KEY',
-    content: 'AIzaSyA-coredevs-free-gemini-8899',
-    tags: ['Google', 'Gemini', 'API'],
-    createdAt: '2024-05-21'
+    content: 'AIzaSyA-coredevs-vault-flash-9911',
+    tags: ['Google', 'Gemini', 'AI'],
+    createdAt: '2024-06-10'
+  },
+  {
+    id: 'r4',
+    title: 'Discord Embed Generator',
+    description: 'Proprietary web-based utility for designing complex rich embeds for your bots.',
+    type: 'TOOL',
+    content: 'https://coredevs.hub/tools/embed-builder',
+    tags: ['Design', 'UI', 'Utility'],
+    createdAt: '2024-06-15'
+  },
+  {
+    id: 'r5',
+    title: 'Token Validator CLI',
+    description: 'Quickly check the validity of Discord tokens without getting ratelimited.',
+    type: 'TOOL',
+    content: 'https://coredevs.hub/tools/validator',
+    tags: ['Security', 'Auth', 'CLI'],
+    createdAt: '2024-06-20'
   }
 ];

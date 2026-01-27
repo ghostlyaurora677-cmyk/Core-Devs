@@ -13,10 +13,14 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
   const [explanation, setExplanation] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(resource.content);
-    setIsCopied(true);
-    setTimeout(() => setIsCopied(false), 2000);
+  const handleAction = () => {
+    if (resource.type === 'TOOL') {
+      window.open(resource.content, '_blank');
+    } else {
+      navigator.clipboard.writeText(resource.content);
+      setIsCopied(true);
+      setTimeout(() => setIsCopied(false), 2000);
+    }
   };
 
   const handleExplain = async () => {
@@ -27,17 +31,20 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
     setIsLoading(false);
   };
 
+  const typeIcon = resource.type === 'API_KEY' ? '🔑' : resource.type === 'CODE_SNIPPET' ? '💻' : '🛠️';
+  const typeColor = resource.type === 'API_KEY' ? 'amber' : resource.type === 'CODE_SNIPPET' ? 'indigo' : 'purple';
+
   return (
     <div className="rounded-[2.5rem] glass p-8 flex flex-col h-full card-highlight shadow-xl overflow-hidden relative group/card">
-      <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none group-hover/card:scale-125 group-hover/card:opacity-10 transition-all duration-700">
-         <span className="text-7xl font-black">{resource.type === 'API_KEY' ? '🔑' : '💻'}</span>
+      <div className={`absolute top-0 right-0 p-8 opacity-5 pointer-events-none group-hover/card:scale-125 group-hover/card:opacity-10 transition-all duration-700`}>
+         <span className="text-7xl font-black">{typeIcon}</span>
       </div>
 
       <div className="flex justify-between items-start mb-6 relative z-10">
         <span className={`text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest border transition-colors ${
-          resource.type === 'API_KEY' 
-          ? 'bg-amber-500/10 text-amber-500 border-amber-500/20 group-hover/card:border-amber-500/50' 
-          : 'bg-indigo-500/10 text-indigo-500 border-indigo-500/20 group-hover/card:border-indigo-500/50'
+          resource.type === 'API_KEY' ? 'bg-amber-500/10 text-amber-500 border-amber-500/20' : 
+          resource.type === 'CODE_SNIPPET' ? 'bg-indigo-500/10 text-indigo-500 border-indigo-500/20' : 
+          'bg-purple-500/10 text-purple-500 border-purple-500/20'
         }`}>
           {resource.type.replace('_', ' ')}
         </span>
@@ -56,7 +63,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
       <div className="space-y-4 relative z-10">
         <div className="relative group/content">
           <div className={`bg-black/40 rounded-2xl p-5 font-mono text-xs overflow-hidden break-all text-slate-300 min-h-[60px] flex items-center border border-white/5 group-hover/content:border-white/20 transition-all ${resource.type === 'API_KEY' && !isRevealed ? 'blur-sm select-none' : ''}`}>
-            {resource.content}
+            {resource.type === 'TOOL' ? resource.content.replace('https://', '') : resource.content}
           </div>
           
           <div className="absolute right-3 top-1/2 -translate-y-1/2 flex gap-2 opacity-0 group-hover/content:opacity-100 transition-all duration-300">
@@ -64,7 +71,6 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
               <button 
                 onClick={() => setIsRevealed(!isRevealed)}
                 className="p-3 bg-white/10 rounded-xl hover:bg-white/20 transition-all text-white backdrop-blur-md border border-white/10"
-                title={isRevealed ? "Hide Content" : "Reveal Content"}
               >
                 {isRevealed ? (
                   <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -79,13 +85,16 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
               </button>
             )}
             <button 
-              onClick={handleCopy}
-              className="p-3 bg-indigo-600 rounded-xl hover:bg-indigo-500 transition-all text-white shadow-lg active:scale-90"
-              title="Copy to Clipboard"
+              onClick={handleAction}
+              className={`p-3 rounded-xl transition-all text-white shadow-lg active:scale-90 ${resource.type === 'TOOL' ? 'bg-purple-600 hover:bg-purple-500' : 'bg-indigo-600 hover:bg-indigo-500'}`}
             >
               {isCopied ? (
                 <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
                   <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+              ) : resource.type === 'TOOL' ? (
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                 </svg>
               ) : (
                 <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
@@ -97,24 +106,26 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
           </div>
         </div>
 
-        <button 
-          onClick={handleExplain}
-          className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-[10px] font-black uppercase tracking-widest text-slate-300 py-4 rounded-xl transition-all border border-white/5 active:scale-95 group/btn overflow-hidden relative"
-        >
-          <div className="absolute inset-0 bg-indigo-500/10 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300"></div>
-          <span className="relative z-10 flex items-center gap-2">
-            {isLoading ? (
-              <div className="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
-            ) : (
-              <>
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                Nexus AI Insights
-              </>
-            )}
-          </span>
-        </button>
+        {resource.type === 'CODE_SNIPPET' && (
+          <button 
+            onClick={handleExplain}
+            className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-[10px] font-black uppercase tracking-widest text-slate-300 py-4 rounded-xl transition-all border border-white/5 active:scale-95 group/btn overflow-hidden relative"
+          >
+            <div className="absolute inset-0 bg-indigo-500/10 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300"></div>
+            <span className="relative z-10 flex items-center gap-2">
+              {isLoading ? (
+                <div className="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                <>
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                  </svg>
+                  Nexus AI Insights
+                </>
+              )}
+            </span>
+          </button>
+        )}
 
         {explanation && (
           <div className="p-5 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl text-[11px] text-indigo-200 leading-relaxed animate-in fade-in slide-in-from-top-2">
