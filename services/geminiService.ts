@@ -1,8 +1,9 @@
-
 import { GoogleGenAI } from "@google/genai";
 
-function safeGetApiKey(): string {
+// Secure helper to fetch API key without crashing
+function getSafeApiKey(): string {
   try {
+    // Check multiple potential locations
     return (window as any).process?.env?.API_KEY || "";
   } catch (e) {
     return "";
@@ -10,24 +11,24 @@ function safeGetApiKey(): string {
 }
 
 export async function explainCode(code: string) {
-  const apiKey = safeGetApiKey();
-  if (!apiKey) return "AI services are unavailable (Missing Key).";
+  const apiKey = getSafeApiKey();
+  if (!apiKey) return "AI Insights unavailable (System offline).";
 
   try {
     const ai = new GoogleGenAI({ apiKey });
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
-      contents: `Explain this briefly:\n\n${code}`,
+      contents: `Briefly explain this code for a Discord bot dev:\n\n${code}`,
     });
-    return response.text || "No explanation.";
+    return response.text || "No insights found.";
   } catch (error) {
-    return "AI Error.";
+    return "AI Error occurred.";
   }
 }
 
 export async function getAssistantResponse(prompt: string) {
-  const apiKey = safeGetApiKey();
-  if (!apiKey) return "I am currently offline.";
+  const apiKey = getSafeApiKey();
+  if (!apiKey) return "I am Nexus AI. I'm currently in standalone mode.";
 
   try {
     const ai = new GoogleGenAI({ apiKey });
@@ -35,8 +36,8 @@ export async function getAssistantResponse(prompt: string) {
       model: 'gemini-3-flash-preview',
       contents: prompt,
     });
-    return response.text || "No response.";
+    return response.text || "I couldn't process that request.";
   } catch (error) {
-    return "Error connecting.";
+    return "Nexus AI Connection Error.";
   }
 }

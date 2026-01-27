@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import BotCard from './components/BotCard';
@@ -18,53 +17,29 @@ const App: React.FC = () => {
   const [selectedBot, setSelectedBot] = useState<BotInfo | null>(null);
   const [resources, setResources] = useState<Resource[]>(INITIAL_RESOURCES);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
-  const [isSyncing, setIsSyncing] = useState(false);
-  const [editingResource, setEditingResource] = useState<Resource | null>(null);
   const [isAdmin, setIsAdmin] = useState(false);
-  
-  const [formData, setFormData] = useState({
-    title: '',
-    description: '',
-    type: 'API_KEY' as ResourceType,
-    content: '',
-    tags: ''
-  });
+  const [isSyncing, setIsSyncing] = useState(false);
 
-  // Initialization
+  // Load resources from DB or local storage on mount
   useEffect(() => {
-    // 1. Mark JS as ready for animations
-    document.documentElement.classList.add('js-ready');
-
-    // 2. Fetch data in background
-    const loadData = async () => {
+    async function init() {
       try {
-        const data = await databaseService.getResources();
-        if (data && data.length > 0) setResources(data);
-      } catch (e) {
-        console.warn("Background fetch failed, using defaults", e);
+        const cloudData = await databaseService.getResources();
+        if (cloudData && cloudData.length > 0) {
+          setResources(cloudData);
+        }
+      } catch (err) {
+        console.warn("Background data fetch failed, using defaults.");
       }
-    };
-    loadData();
-
-    // 3. Admin session check
-    try {
-      if (localStorage.getItem('cd_admin_session') === 'active') setIsAdmin(true);
-    } catch (e) {}
+      
+      try {
+        if (localStorage.getItem('cd_admin_session') === 'active') {
+          setIsAdmin(true);
+        }
+      } catch (e) {}
+    }
+    init();
   }, []);
-
-  // Simple Reveal Logic
-  useEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) entry.target.classList.add('active');
-      });
-    }, { threshold: 0.1 });
-
-    const elements = document.querySelectorAll('.reveal');
-    elements.forEach(el => observer.observe(el));
-
-    return () => observer.disconnect();
-  }, [view, resources]);
 
   const handleBotClick = (bot: BotInfo) => {
     setSelectedBot(bot);
@@ -88,40 +63,13 @@ const App: React.FC = () => {
     setView('home');
   };
 
-  const handleAddOrUpdateResource = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!isAdmin) return;
-    setIsSyncing(true);
-    try {
-      const resource: Resource = {
-        id: editingResource?.id || Math.random().toString(36).substr(2, 9),
-        title: formData.title,
-        description: formData.description,
-        type: formData.type,
-        content: formData.content,
-        tags: formData.tags.split(',').map(t => t.trim()).filter(t => t),
-        createdAt: editingResource?.createdAt || new Date().toISOString().split('T')[0]
-      };
-      
-      if (editingResource) await databaseService.updateResource(resource);
-      else await databaseService.addResource(resource);
-      
-      const data = await databaseService.getResources();
-      setResources(data);
-      setEditingResource(null);
-      setFormData({ title: '', description: '', type: 'API_KEY', content: '', tags: '' });
-    } finally {
-      setIsSyncing(false);
-    }
-  };
-
   if (view === 'login') return <LoginView onLogin={handleLogin} onBack={() => setView('home')} />;
   if (view === 'bot-detail' && selectedBot) return <BotDetailView bot={selectedBot} onBack={() => setView('home')} />;
 
   const filteredResources = resources.filter(r => r.type === selectedCategory);
 
   return (
-    <div className={`min-h-screen flex flex-col ${theme === 'dark' ? 'bg-[#000000]' : 'bg-slate-50'}`}>
+    <div className={`min-h-screen flex flex-col ${theme === 'dark' ? 'bg-black' : 'bg-slate-50'} text-white`}>
       <Navbar 
         onNavigate={(v) => (v === 'admin' && !isAdmin) ? setView('login') : setView(v)} 
         currentView={view} 
@@ -130,53 +78,50 @@ const App: React.FC = () => {
         isAdmin={isAdmin}
       />
 
-      <main className="flex-grow pt-20">
+      <main className="flex-grow pt-24 fade-in">
         {view === 'home' && (
-          <div className="fade-in">
-            <section className="px-6 py-28 text-center relative overflow-hidden">
-              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-[500px] bg-indigo-600/10 blur-[150px] -z-10 rounded-full"></div>
-              <div className="reveal">
-                <h1 className="text-6xl md:text-[8rem] font-black tracking-tighter mb-10 leading-none text-white">
-                  CORE <span className="text-[#5865F2]">DEVS</span>
-                </h1>
-                <p className="max-w-2xl mx-auto text-lg text-slate-400 mb-12">
-                  Premium Discord infrastructure and a high-security vault for developers.
-                </p>
-                <div className="flex flex-col sm:flex-row justify-center gap-6">
-                  <button onClick={() => setView('resources')} className="bg-[#5865F2] text-white px-10 py-5 rounded-2xl text-sm font-black hover:scale-105 transition-all">
-                    ENTER THE VAULT
-                  </button>
-                  <a href="#bots" className="px-10 py-5 rounded-2xl text-sm font-black border border-white/10 bg-white/5 text-white">
-                    OUR BOTS
-                  </a>
-                </div>
+          <>
+            <section className="px-6 py-20 text-center relative">
+              <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-96 bg-indigo-600/10 blur-[120px] -z-10"></div>
+              <h1 className="text-7xl md:text-[10rem] font-black tracking-tighter mb-8 leading-none">
+                CORE <span className="text-[#5865F2]">DEVS</span>
+              </h1>
+              <p className="max-w-2xl mx-auto text-xl text-slate-400 mb-12 font-medium">
+                Home of Fynex & Ryzer. High-performance Discord bots and developer assets.
+              </p>
+              <div className="flex flex-wrap justify-center gap-6">
+                <button onClick={() => setView('resources')} className="bg-[#5865F2] hover:bg-indigo-500 text-white px-10 py-5 rounded-2xl font-black text-sm tracking-widest transition-all">
+                  ENTER THE VAULT
+                </button>
+                <a href="#bots" className="px-10 py-5 rounded-2xl font-black text-sm tracking-widest border border-white/10 glass">
+                  BROWSE BOTS
+                </a>
               </div>
             </section>
             
-            <section id="bots" className="px-6 py-24 max-w-7xl mx-auto">
-              <div className="grid grid-cols-1 gap-12">
-                {BOTS.map(bot => (
-                  <div key={bot.id} className="reveal">
-                    <BotCard bot={bot} onViewDetails={handleBotClick} />
-                  </div>
-                ))}
-              </div>
+            <section id="bots" className="px-6 py-24 max-w-7xl mx-auto space-y-12">
+              <h2 className="text-3xl font-black text-center mb-16 uppercase tracking-widest text-slate-500">Infrastructure Status</h2>
+              {BOTS.map(bot => (
+                <BotCard key={bot.id} bot={bot} onViewDetails={handleBotClick} />
+              ))}
             </section>
-          </div>
+          </>
         )}
 
         {view === 'resources' && (
-          <div className="max-w-7xl mx-auto px-6 py-24">
-            <h2 className="text-6xl font-black text-white text-center mb-20 reveal">The Vault</h2>
+          <div className="max-w-7xl mx-auto px-6 py-12">
+            <h2 className="text-6xl font-black mb-20 text-center">The Repository</h2>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-              {['API_KEY', 'CODE_SNIPPET', 'TOOL'].map((type) => (
+              {(['API_KEY', 'CODE_SNIPPET', 'TOOL'] as ResourceType[]).map((type) => (
                 <div 
                   key={type}
-                  onClick={() => { setSelectedCategory(type as ResourceType); setView('category-detail'); }}
-                  className="glass h-80 rounded-[3rem] flex flex-col items-center justify-center cursor-pointer reveal card-highlight"
+                  onClick={() => { setSelectedCategory(type); setView('category-detail'); }}
+                  className="glass p-12 rounded-[3rem] text-center cursor-pointer hover:border-indigo-500/50 transition-all hover:-translate-y-2"
                 >
-                  <span className="text-6xl mb-6">{type === 'API_KEY' ? '🔑' : type === 'CODE_SNIPPET' ? '💻' : '🛠️'}</span>
-                  <h3 className="text-2xl font-black text-white">{type.replace('_', ' ')}</h3>
+                  <div className="text-7xl mb-6">
+                    {type === 'API_KEY' ? '🔑' : type === 'CODE_SNIPPET' ? '💻' : '🛠️'}
+                  </div>
+                  <h3 className="text-2xl font-black uppercase tracking-widest">{type.replace('_', ' ')}</h3>
                 </div>
               ))}
             </div>
@@ -184,21 +129,23 @@ const App: React.FC = () => {
         )}
 
         {view === 'category-detail' && (
-          <div className="max-w-7xl mx-auto px-6 py-24">
-             <button onClick={() => setView('resources')} className="mb-12 text-slate-500 font-black uppercase text-xs tracking-widest">← Back to Vault</button>
-             <h2 className="text-5xl font-black text-white mb-12">{selectedCategory?.replace('_', ' ')}</h2>
-             <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-                {filteredResources.map(res => (
-                  <div key={res.id} className="reveal">
-                    <ResourceCard resource={res} />
-                  </div>
-                ))}
-             </div>
+          <div className="max-w-7xl mx-auto px-6 py-12">
+            <button onClick={() => setView('resources')} className="mb-10 text-slate-400 font-bold hover:text-white transition-colors">← RETURN TO VAULT</button>
+            <h2 className="text-5xl font-black mb-16">{selectedCategory?.replace('_', ' ')} Assets</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {filteredResources.map(res => (
+                <ResourceCard key={res.id} resource={res} />
+              ))}
+            </div>
           </div>
         )}
       </main>
 
       <NexusAssistant />
+      
+      <footer className="py-20 border-t border-white/5 text-center mt-20">
+        <p className="text-slate-600 text-xs font-black tracking-widest uppercase">© 2025 Core Devs Hub • Optimized for Discord Developers</p>
+      </footer>
     </div>
   );
 };
