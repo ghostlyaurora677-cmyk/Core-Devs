@@ -1,51 +1,42 @@
 
 import { GoogleGenAI } from "@google/genai";
 
-// Lazy initialization to prevent 'process is not defined' crash on load
-function getAIClient() {
-  const apiKey = process.env.API_KEY || "";
-  if (!apiKey) {
-    console.warn("API Key is missing. AI features will be disabled.");
-    return null;
+function safeGetApiKey(): string {
+  try {
+    return (window as any).process?.env?.API_KEY || "";
+  } catch (e) {
+    return "";
   }
-  return new GoogleGenAI({ apiKey });
 }
 
 export async function explainCode(code: string) {
-  try {
-    const ai = getAIClient();
-    if (!ai) return "AI services are currently unavailable.";
+  const apiKey = safeGetApiKey();
+  if (!apiKey) return "AI services are unavailable (Missing Key).";
 
+  try {
+    const ai = new GoogleGenAI({ apiKey });
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
-      contents: `Explain this code snippet briefly and highlight potential security risks or best practices:\n\n${code}`,
-      config: {
-        temperature: 0.7,
-        maxOutputTokens: 500,
-      }
+      contents: `Explain this briefly:\n\n${code}`,
     });
-    return response.text || "No explanation generated.";
+    return response.text || "No explanation.";
   } catch (error) {
-    console.error("Error calling Gemini API:", error);
-    return "Failed to get an explanation for this code.";
+    return "AI Error.";
   }
 }
 
 export async function getAssistantResponse(prompt: string) {
-  try {
-    const ai = getAIClient();
-    if (!ai) return "I'm offline right now (API Key missing).";
+  const apiKey = safeGetApiKey();
+  if (!apiKey) return "I am currently offline.";
 
+  try {
+    const ai = new GoogleGenAI({ apiKey });
     const response = await ai.models.generateContent({
       model: 'gemini-3-flash-preview',
       contents: prompt,
-      config: {
-        systemInstruction: "You are Nexus AI, a helpful assistant for the Core Devs Discord community. You help developers find API keys and explain code. Be friendly, concise, and helpful.",
-      }
     });
-    return response.text || "I couldn't process that request.";
+    return response.text || "No response.";
   } catch (error) {
-    console.error("Assistant Error:", error);
-    return "I'm having trouble connecting to my brain right now.";
+    return "Error connecting.";
   }
 }
