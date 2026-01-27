@@ -30,34 +30,48 @@
         }
 
         .glass {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
         }
 
-        /* Scroll Animations */
+        /* Premium Scroll Animations */
         .reveal {
             opacity: 0;
-            transform: translateY(30px);
-            transition: all 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+            filter: blur(10px);
+            transition: all 1.2s cubic-bezier(0.16, 1, 0.3, 1);
+            will-change: transform, opacity, filter;
         }
+
+        .reveal-up { transform: translateY(60px); }
+        .reveal-down { transform: translateY(-40px); }
+        .reveal-left { transform: translateX(-60px); }
+        .reveal-right { transform: translateX(60px); }
+        .reveal-scale { transform: scale(0.92); }
 
         .reveal.active {
             opacity: 1;
-            transform: translateY(0);
+            filter: blur(0px);
+            transform: translate(0, 0) scale(1);
         }
 
-        .fade-in { animation: fadeIn 0.6s ease-out forwards; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
-        
-        .glow { box-shadow: 0 0 20px rgba(88, 101, 242, 0.3); }
-
+        /* Staggered Delays for Grid Items */
         .stagger-1 { transition-delay: 0.1s; }
         .stagger-2 { transition-delay: 0.2s; }
         .stagger-3 { transition-delay: 0.3s; }
+        .stagger-4 { transition-delay: 0.4s; }
+
+        .fade-in { animation: fadeIn 1.2s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(1.1); filter: blur(20px); } to { opacity: 1; transform: scale(1); filter: blur(0); } }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #5865F2; border-radius: 10px; }
+        
+        .glow { box-shadow: 0 0 30px rgba(88, 101, 242, 0.2); }
+        
+        .hero-gradient {
+            background: radial-gradient(circle at center, rgba(88, 101, 242, 0.15) 0%, transparent 70%);
+        }
     </style>
 
     <script type="importmap">
@@ -77,21 +91,40 @@
     <div id="root"></div>
     <script type="module" src="./index.tsx"></script>
     <script>
-        // Simple Intersection Observer for scroll animations
-        function reveal() {
-            var reveals = document.querySelectorAll(".reveal");
-            for (var i = 0; i < reveals.length; i++) {
-                var windowHeight = window.innerHeight;
-                var elementTop = reveals[i].getBoundingClientRect().top;
-                var elementVisible = 100;
-                if (elementTop < windowHeight - elementVisible) {
-                    reveals[i].classList.add("active");
+        // High-performance Intersection Observer for smooth scrolling entries
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('active');
+                    // Once animated, we can unobserve if we want it to stay
+                    // observer.unobserve(entry.target); 
                 }
-            }
+            });
+        }, observerOptions);
+
+        function initObserver() {
+            document.querySelectorAll('.reveal').forEach(el => {
+                observer.observe(el);
+            });
         }
-        window.addEventListener("scroll", reveal);
-        // Initial check
-        setTimeout(reveal, 500);
+
+        // Initialize and watch for dynamic content
+        window.addEventListener('load', initObserver);
+        
+        // Re-run observer check if elements are added dynamically
+        const mutationObserver = new MutationObserver(() => {
+            document.querySelectorAll('.reveal:not(.observed)').forEach(el => {
+                el.classList.add('observed');
+                observer.observe(el);
+            });
+        });
+        
+        mutationObserver.observe(document.body, { childList: true, subtree: true });
     </script>
 </body>
 </html>
