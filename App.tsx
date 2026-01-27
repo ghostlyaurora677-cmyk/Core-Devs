@@ -22,9 +22,10 @@ const App: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
   const [editingResource, setEditingResource] = useState<Resource | null>(null);
+  
   const [isAdmin, setIsAdmin] = useState(() => {
     try {
-      return localStorage.getItem('cd_admin_session') === 'active';
+      return typeof window !== 'undefined' && localStorage.getItem('cd_admin_session') === 'active';
     } catch {
       return false;
     }
@@ -38,57 +39,45 @@ const App: React.FC = () => {
     tags: ''
   });
 
-  const fetchResources = async () => {
-    try {
-      const data = await databaseService.getResources();
-      setResources(data);
-    } catch (err) {
-      console.error("Failed to fetch resources:", err);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  // Fail-safe to prevent stuck black loading screen
+  // Initialization & Fail-safes
   useEffect(() => {
-    const timer = setTimeout(() => {
-      if (isLoading) {
-        console.warn("Loading taking too long, forcing app start...");
+    // 1. Fetch data
+    const init = async () => {
+      try {
+        const data = await databaseService.getResources();
+        setResources(data || []);
+      } catch (err) {
+        console.error("Initialization error:", err);
+      } finally {
         setIsLoading(false);
       }
-    }, 4000);
-    return () => clearTimeout(timer);
-  }, [isLoading]);
+    };
+    init();
 
-  useEffect(() => {
-    fetchResources();
+    // 2. Mark JS as loaded for animation system
+    document.documentElement.classList.add('js-loaded');
+
+    // 3. Absolute fail-safe for loading screen
+    const timer = setTimeout(() => setIsLoading(false), 2000);
+    return () => clearTimeout(timer);
   }, []);
 
-  // Improved Reveal Animation Logic
+  // Intersection Observer for animations
   useEffect(() => {
     if (isLoading) return;
 
-    const initObserver = () => {
-      const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('active');
-          }
-        });
-      }, { threshold: 0.05, rootMargin: '0px 0px -50px 0px' });
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('active');
+        }
+      });
+    }, { threshold: 0.1 });
 
-      const elements = document.querySelectorAll('.reveal');
-      if (elements.length === 0) {
-        // Retry after a short delay if elements aren't rendered yet
-        setTimeout(initObserver, 100);
-        return;
-      }
-      elements.forEach(el => observer.observe(el));
-      return observer;
-    };
+    const elements = document.querySelectorAll('.reveal');
+    elements.forEach(el => observer.observe(el));
 
-    const obs = initObserver();
-    return () => obs?.disconnect();
+    return () => observer.disconnect();
   }, [view, isLoading, resources]);
 
   useEffect(() => {
@@ -149,8 +138,11 @@ const App: React.FC = () => {
         };
         await databaseService.addResource(resource);
       }
-      await fetchResources();
+      const data = await databaseService.getResources();
+      setResources(data || []);
       setFormData({ title: '', description: '', type: 'API_KEY', content: '', tags: '' });
+    } catch (err) {
+      console.error("Update error:", err);
     } finally {
       setIsSyncing(false);
     }
@@ -173,7 +165,8 @@ const App: React.FC = () => {
     setIsSyncing(true);
     try {
       await databaseService.deleteResource(id);
-      await fetchResources();
+      const data = await databaseService.getResources();
+      setResources(data || []);
     } finally {
       setIsSyncing(false);
     }
@@ -185,7 +178,12 @@ const App: React.FC = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  if (isLoading) return <LoadingScreen />;
+  // Main UI Gate
+  if (isLoading) {
+    return <LoadingScreen />;
+  }
+
+  // Routing Logic
   if (view === 'login') return <LoginView onLogin={handleLogin} onBack={() => setView('home')} />;
   if (view === 'bot-detail' && selectedBot) return <BotDetailView bot={selectedBot} onBack={() => setView('home')} />;
 
@@ -244,7 +242,7 @@ const App: React.FC = () => {
               </div>
               <div className="grid grid-cols-1 gap-12">
                 {BOTS.map((bot, index) => (
-                  <div key={bot.id} className="reveal" style={{ transitionDelay: `${index * 100}ms` }}>
+                  <div key={bot.id} className="reveal" style={{ transitionDelay: `${index * 50}ms` }}>
                     <BotCard bot={bot} onViewDetails={handleBotClick} />
                   </div>
                 ))}
@@ -412,7 +410,6 @@ const App: React.FC = () => {
         )}
       </main>
 
-      {/* Global AI Assistant */}
       <NexusAssistant />
 
       <footer className="mt-24 border-t border-white/5 py-16 px-6 bg-[#050505]">
