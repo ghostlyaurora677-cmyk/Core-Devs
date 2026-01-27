@@ -5,29 +5,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Core Devs | Premium Discord Hub</title>
     
-    <!-- 1. CRITICAL: Define process immediately before any modules load -->
+    <!-- 1. CRITICAL: Define process and global immediately -->
     <script>
         window.process = { 
             env: { API_KEY: "" },
             nextTick: function(fn) { setTimeout(fn, 0); }
         };
         window.global = window;
-    </script>
-
-    <!-- 2. EMERGENCY FALLBACK: If app stays black, show a button -->
-    <script>
-        setTimeout(function() {
-            var root = document.getElementById('root');
-            if (root && root.innerHTML.trim() === "") {
-                root.innerHTML = `
-                    <div style="background:#000; color:white; height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; font-family:sans-serif; text-align:center;">
-                        <h1 style="color:#5865F2;">App taking too long?</h1>
-                        <p style="color:#888; margin-bottom:20px;">The JavaScript module system might be blocked by your browser.</p>
-                        <button onclick="location.reload()" style="background:#5865F2; color:white; border:none; padding:12px 24px; border-radius:12px; cursor:pointer; font-weight:900;">RELOAD PAGE</button>
-                    </div>
-                `;
-            }
-        }, 4000);
     </script>
 
     <script src="https://cdn.tailwindcss.com"></script>
@@ -51,8 +35,6 @@
             border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        /* Prevent content from being hidden by default */
-        .reveal { opacity: 1; transform: none; }
         .fade-in { animation: fadeIn 0.4s ease-in; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
@@ -60,21 +42,23 @@
         ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
     </style>
 
-    <!-- 3. FIXED IMPORTMAP: Unified versions (19.0.0) to avoid ERESOLVE conflicts -->
+    <!-- 2. FIXED IMPORTMAP: Consistent 19.0.0 versions -->
     <script type="importmap">
-    {
-      "imports": {
-        "react": "https://esm.sh/react@19.0.0",
-        "react/": "https://esm.sh/react@19.0.0/",
-        "react-dom": "https://esm.sh/react-dom@19.0.0",
-        "react-dom/": "https://esm.sh/react-dom@19.0.0/",
-        "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
-        "@google/genai": "https://esm.sh/@google/genai@1.3.0"
-      }
-    }
-    </script>
+{
+  "imports": {
+    "react": "https://esm.sh/react@19.0.0",
+    "react-dom": "https://esm.sh/react-dom@19.0.0",
+    "react-dom/client": "https://esm.sh/react-dom@19.0.0/client",
+    "@google/genai": "https://esm.sh/@google/genai@1.3.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.4/",
+    "react/": "https://esm.sh/react@^19.2.4/"
+  }
+}
+</script>
 </head>
 <body>
     <div id="root"></div>
+    <!-- 3. CRITICAL: Actually load the app module -->
+    <script type="module" src="./index.tsx"></script>
 </body>
 </html>
