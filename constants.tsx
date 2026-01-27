@@ -1,3 +1,4 @@
+
 import { BotInfo, Resource } from './types';
 
 export const BOTS: BotInfo[] = [
@@ -16,9 +17,9 @@ export const BOTS: BotInfo[] = [
     },
     inviteUrl: 'https://discord.com',
     features: [
-      { title: 'Lossless Audio', description: 'Stream in 320kbps for the ultimate listening experience.', icon: '🔊' },
-      { title: 'Custom Playlists', description: 'Save and load your favorite tracks instantly.', icon: '📜' },
-      { title: 'Slash Commands', description: 'Modern, intuitive interface with full autocomplete support.', icon: '⚡' }
+      { title: 'Lossless Audio', description: 'Stream in 320kbps for the ultimate listening experience.', icon: 'SPEAKER' },
+      { title: 'Custom Playlists', description: 'Save and load your favorite tracks instantly.', icon: 'PLAYLIST' },
+      { title: 'Slash Commands', description: 'Modern, intuitive interface with full autocomplete support.', icon: 'ZAP' }
     ]
   },
   {
@@ -36,9 +37,9 @@ export const BOTS: BotInfo[] = [
     },
     inviteUrl: 'https://discord.com',
     features: [
-      { title: 'AI Automod', description: 'Intelligent filtering that learns from your server context.', icon: '🛡️' },
-      { title: 'Global Economy', description: 'Compete across servers with levels, items, and shops.', icon: '📈' },
-      { title: 'Social Integration', description: 'Connect Twitter, Twitch, and YouTube alerts effortlessly.', icon: '🔗' }
+      { title: 'AI Automod', description: 'Intelligent filtering that learns from your server context.', icon: 'SHIELD' },
+      { title: 'Global Economy', description: 'Compete across servers with levels, items, and shops.', icon: 'CHART' },
+      { title: 'Social Integration', description: 'Connect Twitter, Twitch, and YouTube alerts effortlessly.', icon: 'LINK' }
     ]
   }
 ];

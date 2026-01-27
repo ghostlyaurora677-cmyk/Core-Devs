@@ -5,7 +5,7 @@ import { getAssistantResponse } from '../services/geminiService';
 const NexusAssistant: React.FC = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<{ role: 'user' | 'ai'; text: string }[]>([
-    { role: 'ai', text: 'Welcome to Core Devs Hub. I am Nexus AI. How can I assist your development today?' }
+    { role: 'ai', text: 'Welcome to the CORE DEVS hub. I am Nexus AI. How can I assist your development today?' }
   ]);
   const [input, setInput] = useState('');
   const [isTyping, setIsTyping] = useState(false);
@@ -62,12 +62,12 @@ const NexusAssistant: React.FC = () => {
         <div className="absolute bottom-20 right-0 w-[350px] md:w-[400px] h-[550px] glass rounded-[2.5rem] border-white/10 shadow-[0_30px_100px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden animate-in slide-in-from-bottom-5">
           {/* Header */}
           <div className="p-6 border-b border-white/5 bg-white/5 flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center font-black text-white">CD</div>
+            <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center font-black text-white text-xs">CD</div>
             <div>
-              <h3 className="text-sm font-black text-white uppercase tracking-widest">Nexus AI</h3>
+              <h3 className="text-xs font-black text-white uppercase tracking-widest">Nexus AI</h3>
               <div className="flex items-center gap-1.5">
                 <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full animate-pulse"></div>
-                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">Active Assistant</span>
+                <span className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">CORE DEVS AGENT</span>
               </div>
             </div>
           </div>

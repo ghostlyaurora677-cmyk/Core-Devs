@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BotInfo } from '../types';
 
@@ -9,68 +10,71 @@ interface BotCardProps {
 const BotCard: React.FC<BotCardProps> = ({ bot, onViewDetails }) => {
   return (
     <div 
-      className="reveal group relative overflow-hidden rounded-[2.5rem] glass p-10 card-highlight cursor-pointer border-white/5 hover:border-indigo-500/30 transition-all duration-500"
+      className="reveal group relative overflow-hidden rounded-2xl glass p-8 md:p-12 cursor-pointer border-white/5 hover:border-indigo-500/40 hover:-translate-y-2 hover:shadow-[0_20px_50px_rgba(88,101,242,0.15)] transition-all duration-500 ease-out"
       onClick={() => onViewDetails(bot)}
     >
-      <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.07] transition-all duration-700 select-none">
+      <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.08] transition-all duration-700 select-none group-hover:rotate-6 group-hover:scale-110">
         <span className="text-[12rem] font-black leading-none" style={{ color: bot.color }}>{bot.name.charAt(0)}</span>
       </div>
 
-      <div className="flex flex-col lg:flex-row items-center lg:items-start gap-12 relative z-10">
-        <div className="relative">
+      <div className="flex flex-col lg:flex-row items-center lg:items-center gap-10 relative z-10">
+        <div className="relative group-hover:scale-105 transition-transform duration-500">
           <img 
             src={bot.imageUrl} 
             alt={bot.name} 
-            className="w-40 h-40 rounded-[2.5rem] object-cover ring-8 ring-white/5 group-hover:ring-indigo-500/20 transition-all duration-700 shadow-2xl scale-100 group-hover:scale-105" 
+            className="w-32 h-32 md:w-44 md:h-44 rounded-2xl object-cover ring-4 ring-white/5 group-hover:ring-indigo-500/30 transition-all duration-500 shadow-2xl" 
           />
-          <div className="absolute -bottom-1 -right-1 w-10 h-10 bg-emerald-500 border-[6px] border-[#121212] rounded-full flex items-center justify-center">
-            <div className="w-3 h-3 bg-white rounded-full animate-pulse"></div>
+          <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-emerald-500 border-4 border-black rounded-full flex items-center justify-center">
+            <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
           </div>
         </div>
         
         <div className="flex-1 text-center lg:text-left">
           <div className="flex flex-col lg:flex-row lg:items-center gap-4 mb-4 justify-center lg:justify-start">
-            <h3 className="text-5xl font-black text-white group-hover:text-[#5865F2] transition-colors tracking-tighter">
+            <h3 className="text-4xl md:text-5xl font-black text-white group-hover:text-indigo-400 transition-colors tracking-tighter">
               {bot.name}
             </h3>
-            <span className="px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[9px] font-black text-slate-400 tracking-widest uppercase inline-block">
+            <span className="px-3 py-1 rounded-lg bg-white/5 border border-white/10 text-[8px] font-black text-slate-500 tracking-widest uppercase inline-block">
               {bot.tagline}
             </span>
           </div>
           
-          <p className="text-slate-400 text-base leading-relaxed mb-10 max-w-2xl mx-auto lg:mx-0 font-medium">
+          <p className="text-slate-400 text-sm md:text-base leading-relaxed mb-8 max-w-xl mx-auto lg:mx-0 font-medium opacity-80 group-hover:opacity-100 transition-opacity">
             {bot.description}
           </p>
           
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-8 mb-10 max-w-md mx-auto lg:mx-0">
+          <div className="grid grid-cols-2 gap-8 mb-8 max-w-xs mx-auto lg:mx-0">
             <div>
-              <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-1">Scale</p>
-              <p className="text-xl font-black text-white">{bot.stats.servers} Guilds</p>
+              <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1">Guilds</p>
+              <p className="text-lg font-black text-white group-hover:text-indigo-300 transition-colors">{bot.stats.servers}</p>
             </div>
             <div>
-              <p className="text-[10px] font-black text-slate-600 uppercase tracking-widest mb-1">Impact</p>
-              <p className="text-xl font-black text-white">{bot.stats.users} Users</p>
+              <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1">Users</p>
+              <p className="text-lg font-black text-white group-hover:text-indigo-300 transition-colors">{bot.stats.users}</p>
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-4">
+          <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-3">
              <button 
-               className="px-10 py-4 rounded-xl font-black text-xs uppercase tracking-widest transition-all bg-white text-black hover:bg-[#5865F2] hover:text-white active:scale-95 shadow-xl"
+               className="px-8 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all bg-[#5865F2] text-white hover:bg-white hover:text-black active:scale-95 shadow-lg group/btn"
                onClick={(e) => {
                  e.stopPropagation();
                  onViewDetails(bot);
                }}
              >
-               Explore Modules
+               <span className="flex items-center gap-2">
+                 View Info
+                 <svg xmlns="http://www.w3.org/2000/svg" className="w-3 h-3 group-hover/btn:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+               </span>
              </button>
              <a 
                href={bot.inviteUrl}
                onClick={(e) => e.stopPropagation()}
                target="_blank"
                rel="noopener noreferrer"
-               className="px-10 py-4 rounded-xl font-black text-xs uppercase tracking-widest transition-all border border-white/10 hover:bg-white/5 text-center text-slate-300 hover:text-white"
+               className="px-8 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all border border-white/10 hover:bg-white/5 text-center text-slate-400 hover:text-white"
              >
-               Invite Link
+               Add Bot
              </a>
           </div>
         </div>
