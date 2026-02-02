@@ -3,43 +3,43 @@ import { BotInfo, Resource } from './types';
 
 export const BOTS: BotInfo[] = [
   {
-    id: 'coredevs-music',
-    name: 'CoreDevs Music',
-    tagline: 'High-Fidelity Audio',
-    description: 'The ultimate Discord music solution. Supporting all major platforms with advanced DSP filters, zero-buffering technology, and crystal clear 320kbps audio.',
-    imageUrl: 'https://images.unsplash.com/photo-1614613535308-eb5fbd3d2c17?w=400&h=400&fit=crop',
+    id: 'fynex',
+    name: 'Fynex',
+    tagline: 'High-Fidelity Music',
+    description: 'The ultimate music experience for Discord. Fynex provides crystal clear 320kbps audio, zero buffering, and support for all major streaming platforms. Built for audiophiles and large communities.',
+    imageUrl: './fynex.png',
     bannerUrl: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=1200&h=400&fit=crop',
     color: '#5865F2',
     stats: {
-      servers: '12.4k',
-      users: '2.1M',
-      commands: '50+'
+      servers: '93',
+      users: '75k+',
+      commands: '40+'
     },
-    inviteUrl: 'https://discord.com',
+    inviteUrl: 'https://discord.com/oauth2/authorize?client_id=1409862504405925980',
     features: [
       { title: 'Lossless Audio', description: 'Stream in 320kbps for the ultimate listening experience.', icon: 'SPEAKER' },
       { title: 'Custom Playlists', description: 'Save and load your favorite tracks instantly.', icon: 'PLAYLIST' },
-      { title: 'Slash Commands', description: 'Modern, intuitive interface with full autocomplete support.', icon: 'ZAP' }
+      { title: 'Global Coverage', description: 'Low latency nodes located globally for lag-free playback.', icon: 'ZAP' }
     ]
   },
   {
     id: 'ryzer',
-    name: 'Ryzer Pro',
-    tagline: 'All-in-One Powerhouse',
-    description: 'The ultimate multipurpose utility. From AI-driven moderation to a deep global economy system, Ryzer replaces 10 bots with a single, fast solution.',
-    imageUrl: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=400&h=400&fit=crop',
-    bannerUrl: 'https://images.unsplash.com/photo-1558591710-4b4a1ae0f04d?w=1200&h=400&fit=crop',
+    name: 'RYZER™',
+    tagline: 'Antinuke & Moderation',
+    description: 'The definitive all-in-one security solution. RYZER™ features advanced Antinuke protection, intelligent Auto-moderation, and a robust utility suite to keep your server safe and organized.',
+    imageUrl: './ryzer.png',
+    bannerUrl: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1200&h=400&fit=crop',
     color: '#10b981',
     stats: {
-      servers: '8.2k',
-      users: '1.5M',
-      commands: '150+'
+      servers: '75+',
+      users: '10k+',
+      commands: '120+'
     },
-    inviteUrl: 'https://discord.com',
+    inviteUrl: 'https://discord.com/oauth2/authorize?client_id=1383353669520461824',
     features: [
-      { title: 'AI Automod', description: 'Intelligent filtering that learns from your server context.', icon: 'SHIELD' },
-      { title: 'Global Economy', description: 'Compete across servers with levels, items, and shops.', icon: 'CHART' },
-      { title: 'Social Integration', description: 'Connect Twitter, Twitch, and YouTube alerts effortlessly.', icon: 'LINK' }
+      { title: 'Advanced Antinuke', description: 'Protect your server from malicious raids and unauthorized changes.', icon: 'SHIELD' },
+      { title: 'Smart Automod', description: 'AI-driven moderation that stops bad actors before they start.', icon: 'CHART' },
+      { title: 'Utility Suite', description: 'Everything from logs to roles in one powerful bot.', icon: 'LINK' }
     ]
   }
 ];
