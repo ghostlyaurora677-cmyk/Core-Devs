@@ -2,9 +2,6 @@
 import { Resource } from '../types';
 import { INITIAL_RESOURCES } from '../constants';
 
-/**
- * CORE DEVS MONGODB CONFIGURATION
- */
 const MONGODB_CONFIG = {
   ENDPOINT: 'https://data.mongodb-api.com/app/data-xxxx/endpoint/data/v1', 
   API_KEY: 'YOUR_GENERATED_API_KEY', 
@@ -21,20 +18,27 @@ const headers = {
 };
 
 const IS_CONFIGURED = MONGODB_CONFIG.API_KEY !== 'YOUR_GENERATED_API_KEY';
-const LOCAL_STORAGE_KEY = 'coredevs_vault_v2';
+const DATA_KEY = 'coredevs_vault_final_fix_v5';
+const INIT_KEY = 'coredevs_vault_initialized_v5';
 
 export const databaseService = {
   async getResources(): Promise<Resource[]> {
     const getLocal = () => {
       try {
-        const localData = localStorage.getItem(LOCAL_STORAGE_KEY);
-        if (!localData) {
-          // Initialize local storage with initial data if it's the first time
-          localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(INITIAL_RESOURCES));
+        const isInitialized = localStorage.getItem(INIT_KEY);
+        const localData = localStorage.getItem(DATA_KEY);
+
+        // If never initialized, seed the defaults once
+        if (isInitialized !== 'true' || localData === null) {
+          localStorage.setItem(DATA_KEY, JSON.stringify(INITIAL_RESOURCES));
+          localStorage.setItem(INIT_KEY, 'true');
           return INITIAL_RESOURCES;
         }
+
+        // Return whatever is in storage (could be an empty array [])
         return JSON.parse(localData);
-      } catch {
+      } catch (e) {
+        console.error("Critical Storage Error:", e);
         return INITIAL_RESOURCES;
       }
     };
@@ -43,7 +47,6 @@ export const databaseService = {
       return getLocal();
     }
 
-    // Set a fetch timeout
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 3000);
 
@@ -63,7 +66,7 @@ export const databaseService = {
 
       clearTimeout(timeoutId);
 
-      if (!response.ok) throw new Error('Network response was not ok');
+      if (!response.ok) throw new Error('Network error');
       const result = await response.json();
       
       if (!result.documents || result.documents.length === 0) {
@@ -75,7 +78,6 @@ export const databaseService = {
         id: doc.id || doc._id.toString()
       }));
     } catch (error) {
-      console.warn("MongoDB Fetch Error or Timeout, falling back to local:", error);
       clearTimeout(timeoutId);
       return getLocal();
     }
@@ -83,15 +85,13 @@ export const databaseService = {
 
   async addResource(resource: Resource): Promise<void> {
     try {
-      const localData = localStorage.getItem(LOCAL_STORAGE_KEY);
-      const localResources = localData ? JSON.parse(localData) : INITIAL_RESOURCES;
-      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify([resource, ...localResources]));
-    } catch (e) {
-      console.error("Local Storage Error:", e);
-    }
+      const current = await this.getResources();
+      const updated = [resource, ...current];
+      localStorage.setItem(DATA_KEY, JSON.stringify(updated));
+      localStorage.setItem(INIT_KEY, 'true');
+    } catch (e) {}
 
     if (!IS_CONFIGURED) return;
-
     try {
       await fetch(`${MONGODB_CONFIG.ENDPOINT}/action/insertOne`, {
         method: 'POST',
@@ -103,23 +103,17 @@ export const databaseService = {
           document: resource
         })
       });
-    } catch (error) {
-      console.error("MongoDB Add Error:", error);
-    }
+    } catch (e) {}
   },
 
   async updateResource(resource: Resource): Promise<void> {
     try {
-      const localData = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (localData) {
-        const resources: Resource[] = JSON.parse(localData);
-        const updated = resources.map(r => r.id === resource.id ? resource : r);
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
-      }
+      const current = await this.getResources();
+      const updated = current.map(r => r.id === resource.id ? resource : r);
+      localStorage.setItem(DATA_KEY, JSON.stringify(updated));
     } catch (e) {}
 
     if (!IS_CONFIGURED) return;
-
     try {
       await fetch(`${MONGODB_CONFIG.ENDPOINT}/action/updateOne`, {
         method: 'POST',
@@ -132,27 +126,24 @@ export const databaseService = {
           update: { $set: resource }
         })
       });
-    } catch (error) {
-      console.error("MongoDB Update Error:", error);
-    }
+    } catch (e) {}
   },
 
   async deleteResource(id: string): Promise<void> {
     try {
-      const localData = localStorage.getItem(LOCAL_STORAGE_KEY);
-      if (localData) {
-        const resources: Resource[] = JSON.parse(localData);
-        const filtered = resources.filter(r => r.id !== id);
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(filtered));
-      } else {
-        // If local storage was never set, set it now minus the deleted item
-        const filtered = INITIAL_RESOURCES.filter(r => r.id !== id);
-        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(filtered));
-      }
-    } catch (e) {}
+      const current = await this.getResources();
+      const updated = current.filter(r => r.id !== id);
+      
+      // Save the updated list (even if it is [])
+      localStorage.setItem(DATA_KEY, JSON.stringify(updated));
+      localStorage.setItem(INIT_KEY, 'true');
+      
+      console.log(`Resource ${id} deleted and storage synced.`);
+    } catch (e) {
+      console.error("Delete persistence error:", e);
+    }
 
     if (!IS_CONFIGURED) return;
-
     try {
       await fetch(`${MONGODB_CONFIG.ENDPOINT}/action/deleteOne`, {
         method: 'POST',
@@ -164,15 +155,6 @@ export const databaseService = {
           filter: { id: id }
         })
       });
-    } catch (error) {
-      console.error("MongoDB Delete Error:", error);
-    }
-  },
-
-  getStatus(): { isLive: boolean; message: string } {
-    return {
-      isLive: IS_CONFIGURED,
-      message: IS_CONFIGURED ? `CONNECTED TO CLUSTER: ${MONGODB_CONFIG.CLUSTER}` : "OFFLINE: USING LOCAL STORAGE"
-    };
+    } catch (e) {}
   }
 };

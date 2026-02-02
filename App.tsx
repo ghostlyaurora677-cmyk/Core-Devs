@@ -8,6 +8,8 @@ import LoginView from './components/LoginView';
 import AdminPanelView from './components/AdminPanelView';
 import TeamView from './components/TeamView';
 import Footer from './components/Footer';
+import LoadingScreen from './components/LoadingScreen';
+import NexusAssistant from './components/NexusAssistant';
 import { BOTS, INITIAL_RESOURCES, SUPPORT_SERVER_URL } from './constants';
 import { Resource, ResourceType, BotInfo } from './types';
 import { databaseService } from './services/databaseService';
@@ -18,17 +20,18 @@ const App: React.FC = () => {
   const [view, setView] = useState<'home' | 'resources' | 'admin' | 'bot-detail' | 'login' | 'category-detail' | 'team'>('home');
   const [selectedCategory, setSelectedCategory] = useState<ResourceType | null>(null);
   const [selectedBot, setSelectedBot] = useState<BotInfo | null>(null);
-  const [resources, setResources] = useState<Resource[]>(INITIAL_RESOURCES);
+  const [resources, setResources] = useState<Resource[]>([]);
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [isAdmin, setIsAdmin] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
     async function init() {
-      const cloudData = await databaseService.getResources();
-      if (cloudData && cloudData.length > 0) {
-        setResources(cloudData);
-      }
+      const data = await databaseService.getResources();
+      setResources(data || []);
+      setIsLoaded(true);
+
       if (sessionStorage.getItem('cd_admin_session') === 'active') {
         setIsAdmin(true);
       }
@@ -49,12 +52,12 @@ const App: React.FC = () => {
   };
 
   const handleDeleteResource = async (id: string) => {
-    setResources(prev => prev.filter(r => r.id !== id));
-    try {
-      await databaseService.deleteResource(id);
-    } catch (err) {
-      console.error("Cloud wipe failed, resource might still exist in DB:", err);
-    }
+    // 1. Update state immediately
+    const updatedResources = resources.filter(r => r.id !== id);
+    setResources(updatedResources);
+    
+    // 2. Persist to storage
+    await databaseService.deleteResource(id);
   };
 
   const handleLogin = (password: string): boolean => {
@@ -70,21 +73,22 @@ const App: React.FC = () => {
   const handleLogout = () => {
     setIsAdmin(false);
     sessionStorage.removeItem('cd_admin_session');
-    localStorage.removeItem('cd_admin_session');
     setView('home');
   };
 
   const handleNavigate = (v: any) => {
     if (isAdmin && view === 'admin' && v !== 'admin') {
-      handleLogout();
+      setView(v);
     } else if (v === 'admin' && !isAdmin) {
       setView('login');
     } else {
       setView(v);
     }
-    setSearchQuery(''); // Reset search on navigation
+    setSearchQuery(''); 
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
+
+  if (!isLoaded) return <LoadingScreen />;
 
   if (view === 'login') return <LoginView onLogin={handleLogin} onBack={() => setView('home')} />;
   if (view === 'admin' && isAdmin) return (
@@ -93,7 +97,7 @@ const App: React.FC = () => {
       onAdd={handleAddResource} 
       onUpdate={handleUpdateResource} 
       onDelete={handleDeleteResource} 
-      onBack={handleLogout} 
+      onBack={() => setView('home')} 
     />
   );
   if (view === 'bot-detail' && selectedBot) return <BotDetailView bot={selectedBot} theme={theme} onBack={() => setView('home')} />;
@@ -223,9 +227,7 @@ const App: React.FC = () => {
                       <div className="flex items-center gap-6 group">
                         <div className={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all ${theme === 'dark' ? 'bg-white/5 text-slate-400' : 'bg-white text-slate-600 shadow-sm'} group-hover:bg-[#5865F2] group-hover:text-white`}>
                           <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          </svg>
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
                         </div>
                         <div>
                           <h4 className={`font-black uppercase tracking-widest text-xs ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>Technical Support</h4>
@@ -330,6 +332,7 @@ const App: React.FC = () => {
         )}
       </main>
 
+      <NexusAssistant />
       <Footer onNavigate={handleNavigate} theme={theme} />
     </div>
   );
