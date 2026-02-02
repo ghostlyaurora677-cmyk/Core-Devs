@@ -30,11 +30,12 @@ const App: React.FC = () => {
     async function init() {
       const data = await databaseService.getResources();
       setResources(data || []);
-      setIsLoaded(true);
-
+      
       if (sessionStorage.getItem('cd_admin_session') === 'active') {
         setIsAdmin(true);
       }
+      
+      setIsLoaded(true);
     }
     init();
   }, []);
@@ -52,11 +53,8 @@ const App: React.FC = () => {
   };
 
   const handleDeleteResource = async (id: string) => {
-    // 1. Update state immediately
     const updatedResources = resources.filter(r => r.id !== id);
     setResources(updatedResources);
-    
-    // 2. Persist to storage
     await databaseService.deleteResource(id);
   };
 
@@ -74,13 +72,16 @@ const App: React.FC = () => {
     setIsAdmin(false);
     sessionStorage.removeItem('cd_admin_session');
     setView('home');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleNavigate = (v: any) => {
-    if (isAdmin && view === 'admin' && v !== 'admin') {
-      setView(v);
-    } else if (v === 'admin' && !isAdmin) {
-      setView('login');
+    if (v === 'admin') {
+      if (isAdmin) {
+        setView('admin');
+      } else {
+        setView('login');
+      }
     } else {
       setView(v);
     }
@@ -97,7 +98,7 @@ const App: React.FC = () => {
       onAdd={handleAddResource} 
       onUpdate={handleUpdateResource} 
       onDelete={handleDeleteResource} 
-      onBack={() => setView('home')} 
+      onBack={handleLogout} 
     />
   );
   if (view === 'bot-detail' && selectedBot) return <BotDetailView bot={selectedBot} theme={theme} onBack={() => setView('home')} />;

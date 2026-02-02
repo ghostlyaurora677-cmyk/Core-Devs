@@ -17,9 +17,9 @@ const headers = {
   'api-key': MONGODB_CONFIG.API_KEY,
 };
 
-const IS_CONFIGURED = MONGODB_CONFIG.API_KEY !== 'YOUR_GENERATED_API_KEY';
-const DATA_KEY = 'coredevs_vault_final_fix_v5';
-const INIT_KEY = 'coredevs_vault_initialized_v5';
+const IS_CONFIGURED = MONGODB_CONFIG.API_KEY !== 'YOUR_GENERATED_API_KEY' && MONGODB_CONFIG.API_KEY !== '';
+const DATA_KEY = 'coredevs_vault_v6_stable';
+const INIT_KEY = 'coredevs_vault_initialized_v6';
 
 export const databaseService = {
   async getResources(): Promise<Resource[]> {
@@ -28,14 +28,12 @@ export const databaseService = {
         const isInitialized = localStorage.getItem(INIT_KEY);
         const localData = localStorage.getItem(DATA_KEY);
 
-        // If never initialized, seed the defaults once
         if (isInitialized !== 'true' || localData === null) {
           localStorage.setItem(DATA_KEY, JSON.stringify(INITIAL_RESOURCES));
           localStorage.setItem(INIT_KEY, 'true');
           return INITIAL_RESOURCES;
         }
 
-        // Return whatever is in storage (could be an empty array [])
         return JSON.parse(localData);
       } catch (e) {
         console.error("Critical Storage Error:", e);
@@ -89,7 +87,9 @@ export const databaseService = {
       const updated = [resource, ...current];
       localStorage.setItem(DATA_KEY, JSON.stringify(updated));
       localStorage.setItem(INIT_KEY, 'true');
-    } catch (e) {}
+    } catch (e) {
+      console.error("Add resource local error:", e);
+    }
 
     if (!IS_CONFIGURED) return;
     try {
@@ -111,7 +111,9 @@ export const databaseService = {
       const current = await this.getResources();
       const updated = current.map(r => r.id === resource.id ? resource : r);
       localStorage.setItem(DATA_KEY, JSON.stringify(updated));
-    } catch (e) {}
+    } catch (e) {
+      console.error("Update resource local error:", e);
+    }
 
     if (!IS_CONFIGURED) return;
     try {
@@ -133,12 +135,8 @@ export const databaseService = {
     try {
       const current = await this.getResources();
       const updated = current.filter(r => r.id !== id);
-      
-      // Save the updated list (even if it is [])
       localStorage.setItem(DATA_KEY, JSON.stringify(updated));
       localStorage.setItem(INIT_KEY, 'true');
-      
-      console.log(`Resource ${id} deleted and storage synced.`);
     } catch (e) {
       console.error("Delete persistence error:", e);
     }
