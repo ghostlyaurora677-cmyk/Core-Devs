@@ -46,7 +46,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, theme, toggleT
                 CORE DEVS
               </span>
               <div className="flex items-center gap-1.5">
-                <div className="w-1 h-1 rounded-full bg-emerald-500 animate-pulse"></div>
+                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
                 <span className="text-[8px] font-bold text-slate-500 tracking-[0.2em] uppercase">Online</span>
               </div>
             </div>
@@ -85,12 +85,12 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, theme, toggleT
             )}
           </button>
 
-          {/* Auth Button */}
+          {/* Staff Login Button */}
           <button 
             onClick={() => onNavigate('admin')}
             className={`px-4 py-2.5 rounded-xl border font-black text-[10px] uppercase tracking-widest transition-all flex items-center gap-2 active:scale-95 ${currentView === 'admin' ? 'bg-indigo-600 border-indigo-500 text-white shadow-lg' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'}`}
           >
-            {isAdmin ? 'ADMIN' : 'AUTH'}
+            {isAdmin ? 'ADMIN PANEL' : 'STAFF LOGIN'}
           </button>
 
           {/* Mobile Menu Toggle */}

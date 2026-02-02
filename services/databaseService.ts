@@ -21,13 +21,19 @@ const headers = {
 };
 
 const IS_CONFIGURED = MONGODB_CONFIG.API_KEY !== 'YOUR_GENERATED_API_KEY';
+const LOCAL_STORAGE_KEY = 'coredevs_vault_v2';
 
 export const databaseService = {
   async getResources(): Promise<Resource[]> {
     const getLocal = () => {
       try {
-        const localData = localStorage.getItem('coredevs_cloud_v1');
-        return localData ? JSON.parse(localData) : INITIAL_RESOURCES;
+        const localData = localStorage.getItem(LOCAL_STORAGE_KEY);
+        if (!localData) {
+          // Initialize local storage with initial data if it's the first time
+          localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(INITIAL_RESOURCES));
+          return INITIAL_RESOURCES;
+        }
+        return JSON.parse(localData);
       } catch {
         return INITIAL_RESOURCES;
       }
@@ -77,9 +83,9 @@ export const databaseService = {
 
   async addResource(resource: Resource): Promise<void> {
     try {
-      const localData = localStorage.getItem('coredevs_cloud_v1');
+      const localData = localStorage.getItem(LOCAL_STORAGE_KEY);
       const localResources = localData ? JSON.parse(localData) : INITIAL_RESOURCES;
-      localStorage.setItem('coredevs_cloud_v1', JSON.stringify([resource, ...localResources]));
+      localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify([resource, ...localResources]));
     } catch (e) {
       console.error("Local Storage Error:", e);
     }
@@ -104,11 +110,11 @@ export const databaseService = {
 
   async updateResource(resource: Resource): Promise<void> {
     try {
-      const localData = localStorage.getItem('coredevs_cloud_v1');
+      const localData = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (localData) {
         const resources: Resource[] = JSON.parse(localData);
         const updated = resources.map(r => r.id === resource.id ? resource : r);
-        localStorage.setItem('coredevs_cloud_v1', JSON.stringify(updated));
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(updated));
       }
     } catch (e) {}
 
@@ -133,10 +139,15 @@ export const databaseService = {
 
   async deleteResource(id: string): Promise<void> {
     try {
-      const localData = localStorage.getItem('coredevs_cloud_v1');
+      const localData = localStorage.getItem(LOCAL_STORAGE_KEY);
       if (localData) {
-        const resources = JSON.parse(localData);
-        localStorage.setItem('coredevs_cloud_v1', JSON.stringify(resources.filter((r: any) => r.id !== id)));
+        const resources: Resource[] = JSON.parse(localData);
+        const filtered = resources.filter(r => r.id !== id);
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(filtered));
+      } else {
+        // If local storage was never set, set it now minus the deleted item
+        const filtered = INITIAL_RESOURCES.filter(r => r.id !== id);
+        localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(filtered));
       }
     } catch (e) {}
 

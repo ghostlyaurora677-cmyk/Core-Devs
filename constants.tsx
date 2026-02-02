@@ -1,13 +1,15 @@
 
 import { BotInfo, Resource } from './types';
 
+export const SUPPORT_SERVER_URL = 'https://dsc.gg/coredevs';
+
 export const BOTS: BotInfo[] = [
   {
     id: 'fynex',
     name: 'Fynex',
     tagline: 'High-Fidelity Music',
     description: 'The ultimate music experience for Discord. Fynex provides crystal clear 320kbps audio, zero buffering, and support for all major streaming platforms. Built for audiophiles and large communities.',
-    imageUrl: './fynex.png',
+    imageUrl: 'fynex.png',
     bannerUrl: 'https://images.unsplash.com/photo-1470225620780-dba8ba36b745?w=1200&h=400&fit=crop',
     color: '#5865F2',
     stats: {
@@ -27,7 +29,7 @@ export const BOTS: BotInfo[] = [
     name: 'RYZER™',
     tagline: 'Antinuke & Moderation',
     description: 'The definitive all-in-one security solution. RYZER™ features advanced Antinuke protection, intelligent Auto-moderation, and a robust utility suite to keep your server safe and organized.',
-    imageUrl: './ryzer.png',
+    imageUrl: 'ryzer.png',
     bannerUrl: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1200&h=400&fit=crop',
     color: '#10b981',
     stats: {

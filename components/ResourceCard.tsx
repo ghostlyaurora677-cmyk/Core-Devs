@@ -5,6 +5,7 @@ import { explainCode } from '../services/geminiService';
 
 interface ResourceCardProps {
   resource: Resource;
+  theme?: 'light' | 'dark';
 }
 
 const IconMap = {
@@ -20,13 +21,13 @@ const IconMap = {
   ),
   TOOL: (
     <svg xmlns="http://www.w3.org/2000/svg" className="w-full h-full" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
     </svg>
   )
 };
 
-const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
+const ResourceCard: React.FC<ResourceCardProps> = ({ resource, theme = 'dark' }) => {
   const [isCopied, setIsCopied] = useState(false);
   const [isRevealed, setIsRevealed] = useState(false);
   const [explanation, setExplanation] = useState<string | null>(null);
@@ -51,8 +52,13 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
   };
 
   return (
-    <div className="reveal rounded-[2.5rem] glass p-8 flex flex-col h-full card-highlight shadow-xl overflow-hidden relative group/card">
-      <div className={`absolute top-0 right-0 p-8 w-32 h-32 opacity-5 pointer-events-none group-hover/card:scale-125 group-hover/card:opacity-10 transition-all duration-700`}>
+    <div className={`reveal rounded-[2.5rem] p-8 flex flex-col h-full card-highlight transition-all duration-500 overflow-hidden relative group/card 
+      hover:scale-[1.02] 
+      ${theme === 'dark' 
+        ? 'glass border-white/5 shadow-xl hover:border-indigo-500/30 hover:shadow-[0_0_40px_rgba(88,101,242,0.15)]' 
+        : 'bg-white border border-slate-200 shadow-md hover:shadow-2xl hover:border-indigo-500/20'}`}>
+      
+      <div className={`absolute top-0 right-0 p-8 w-32 h-32 opacity-5 pointer-events-none group-hover/card:scale-125 group-hover/card:opacity-10 transition-all duration-700 ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
          {IconMap[resource.type]}
       </div>
 
@@ -67,18 +73,18 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
         <span className="text-[9px] text-slate-500 font-black uppercase tracking-widest">{resource.createdAt}</span>
       </div>
       
-      <h4 className="text-2xl font-black text-white mb-3 relative z-10 group-hover/card:text-indigo-400 transition-colors duration-300">{resource.title}</h4>
-      <p className="text-slate-400 text-sm leading-relaxed mb-8 flex-grow relative z-10 font-medium">{resource.description}</p>
+      <h4 className={`text-2xl font-black mb-3 relative z-10 group-hover/card:text-indigo-400 transition-colors duration-300 ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>{resource.title}</h4>
+      <p className={`text-sm leading-relaxed mb-8 flex-grow relative z-10 font-medium ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>{resource.description}</p>
       
       <div className="flex flex-wrap gap-2 mb-8 relative z-10">
         {resource.tags.map(tag => (
-          <span key={tag} className="text-[10px] font-black text-slate-500 bg-white/5 px-3 py-1 rounded-full border border-white/5 uppercase tracking-tighter hover:text-white transition-colors cursor-default">#{tag}</span>
+          <span key={tag} className={`text-[10px] font-black px-3 py-1 rounded-full border uppercase tracking-tighter hover:text-white transition-colors cursor-default ${theme === 'dark' ? 'text-slate-500 bg-white/5 border-white/5' : 'text-slate-400 bg-slate-50 border-slate-100'}`}>#{tag}</span>
         ))}
       </div>
 
       <div className="space-y-4 relative z-10">
         <div className="relative group/content">
-          <div className={`bg-black/40 rounded-2xl p-5 font-mono text-xs overflow-hidden break-all text-slate-300 min-h-[60px] flex items-center border border-white/5 group-hover/content:border-white/20 transition-all ${resource.type === 'API_KEY' && !isRevealed ? 'blur-sm select-none' : ''}`}>
+          <div className={`rounded-2xl p-5 font-mono text-xs overflow-hidden break-all min-h-[60px] flex items-center border transition-all ${resource.type === 'API_KEY' && !isRevealed ? 'blur-sm select-none' : ''} ${theme === 'dark' ? 'bg-black/40 text-slate-300 border-white/5 group-hover/content:border-white/20' : 'bg-slate-50 text-slate-700 border-slate-200 group-hover/content:border-indigo-500/20'}`}>
             {resource.type === 'TOOL' ? resource.content.replace('https://', '') : resource.content}
           </div>
           
@@ -86,7 +92,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
             {resource.type === 'API_KEY' && (
               <button 
                 onClick={() => setIsRevealed(!isRevealed)}
-                className="p-3 bg-white/10 rounded-xl hover:bg-white/20 transition-all text-white backdrop-blur-md border border-white/10"
+                className={`p-3 rounded-xl transition-all backdrop-blur-md border ${theme === 'dark' ? 'bg-white/10 text-white border-white/10 hover:bg-white/20' : 'bg-white/80 text-slate-600 border-slate-200 hover:bg-white'}`}
               >
                 {isRevealed ? (
                   <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -95,7 +101,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
                 ) : (
                   <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268-2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                   </svg>
                 )}
               </button>
@@ -125,9 +131,9 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
         {resource.type === 'CODE_SNIPPET' && (
           <button 
             onClick={handleExplain}
-            className="w-full flex items-center justify-center gap-2 bg-white/5 hover:bg-white/10 text-[10px] font-black uppercase tracking-widest text-slate-300 py-4 rounded-xl transition-all border border-white/5 active:scale-95 group/btn overflow-hidden relative"
+            className={`w-full flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-widest py-4 rounded-xl transition-all border active:scale-95 group/btn overflow-hidden relative ${theme === 'dark' ? 'bg-white/5 border-white/5 text-slate-300 hover:bg-white/10' : 'bg-slate-50 border-slate-200 text-slate-600 hover:bg-slate-100 hover:border-slate-300'}`}
           >
-            <div className="absolute inset-0 bg-indigo-500/10 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300"></div>
+            <div className={`absolute inset-0 translate-y-full group-hover/btn:translate-y-0 transition-transform duration-300 ${theme === 'dark' ? 'bg-indigo-500/10' : 'bg-indigo-500/5'}`}></div>
             <span className="relative z-10 flex items-center gap-2">
               {isLoading ? (
                 <div className="w-4 h-4 border-2 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
@@ -144,9 +150,9 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource }) => {
         )}
 
         {explanation && (
-          <div className="p-5 bg-indigo-500/10 border border-indigo-500/20 rounded-2xl text-[11px] text-indigo-200 leading-relaxed animate-in fade-in slide-in-from-top-2">
+          <div className={`p-5 rounded-2xl text-[11px] leading-relaxed animate-in fade-in slide-in-from-top-2 border ${theme === 'dark' ? 'bg-indigo-500/10 border-indigo-500/20 text-indigo-200' : 'bg-indigo-50 border-indigo-200 text-indigo-900'}`}>
             <div className="font-black mb-2 flex items-center gap-2 uppercase tracking-widest">
-              <span className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-pulse"></span>
+              <span className={`w-1.5 h-1.5 rounded-full animate-pulse ${theme === 'dark' ? 'bg-indigo-400' : 'bg-indigo-600'}`}></span>
               AI Report:
             </div>
             {explanation}

@@ -41,21 +41,21 @@
         .reveal {
             opacity: 0;
             filter: blur(15px);
-            transition: all 0.8s cubic-bezier(0.19, 1, 0.22, 1);
+            transition: all 1s cubic-bezier(0.23, 1, 0.32, 1);
             will-change: transform, opacity, filter;
         }
 
-        .reveal-up { transform: translateY(40px); }
-        .reveal-down { transform: translateY(-40px); }
-        .reveal-left { transform: translateX(-40px); }
-        .reveal-right { transform: translateX(40px); }
-        .reveal-scale { transform: scale(0.95); }
+        .reveal-up { transform: translateY(60px); }
+        .reveal-down { transform: translateY(-60px); }
+        .reveal-left { transform: translateX(-60px); }
+        .reveal-right { transform: translateX(60px); }
+        .reveal-scale { transform: scale(0.85) translateY(30px) rotate(-1deg); }
 
         /* active class trigger - toggles on and off for repeated animation */
         .reveal.active {
             opacity: 1 !important;
             filter: blur(0px) !important;
-            transform: translate(0, 0) scale(1) !important;
+            transform: translate(0, 0) scale(1) rotate(0deg) !important;
         }
 
         .stagger-1 { transition-delay: 0.1s; }
@@ -103,23 +103,19 @@
     <div id="root"></div>
     <script type="module" src="./index.tsx"></script>
     <script>
-        // Update the IntersectionObserver to toggle the 'active' class 
-        // every time an element enters or leaves the viewport.
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
                     entry.target.classList.add('active');
                 } else {
-                    // This allows the animation to re-trigger when scrolling back
                     entry.target.classList.remove('active');
                 }
             });
         }, {
-            threshold: 0.1,
+            threshold: 0.15,
             rootMargin: '0px 0px -50px 0px'
         });
 
-        // Use MutationObserver to handle dynamically rendered elements (React components)
         const layoutObserver = new MutationObserver((mutations) => {
             document.querySelectorAll('.reveal:not(.is-observed)').forEach(el => {
                 el.classList.add('is-observed');
@@ -129,11 +125,12 @@
 
         layoutObserver.observe(document.body, { childList: true, subtree: true });
         
-        // Initial setup for static content
         window.addEventListener('load', () => {
              document.querySelectorAll('.reveal').forEach(el => {
-                el.classList.add('is-observed');
-                observer.observe(el);
+                if (!el.classList.contains('is-observed')) {
+                    el.classList.add('is-observed');
+                    observer.observe(el);
+                }
             });
         });
     </script>
