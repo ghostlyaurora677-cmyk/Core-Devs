@@ -1,11 +1,11 @@
 
 import React from 'react';
-import { BotInfo } from '../types';
+import { BotInfo, ThemeType } from '../types';
 import { SUPPORT_SERVER_URL } from '../constants';
 
 interface BotDetailViewProps {
   bot: BotInfo;
-  theme?: 'light' | 'dark';
+  theme?: ThemeType;
   onBack: () => void;
 }
 
@@ -61,14 +61,12 @@ const getFeatureIcon = (title: string, iconKey: string) => {
   const t = title.toLowerCase();
   const k = iconKey.toUpperCase();
 
-  // Primary check by key
   if (k === 'SPEAKER' || k === 'AUDIO') return FeatureIconMap.AUDIO;
   if (k === 'SHIELD' || k === 'SECURITY') return FeatureIconMap.SHIELD;
   if (k === 'LOCK' || k === 'ANTINUKE') return FeatureIconMap.LOCK;
   if (k === 'GLOBE' || k === 'NETWORK') return FeatureIconMap.GLOBE;
   if (FeatureIconMap[k]) return FeatureIconMap[k];
 
-  // Secondary check by title keywords
   if (t.includes('audio') || t.includes('music') || t.includes('sound')) return FeatureIconMap.AUDIO;
   if (t.includes('playlist') || t.includes('queue') || t.includes('list')) return FeatureIconMap.PLAYLIST;
   if (t.includes('global') || t.includes('coverage') || t.includes('zap') || t.includes('speed') || t.includes('performance')) return FeatureIconMap.ZAP;
@@ -83,8 +81,7 @@ const getFeatureIcon = (title: string, iconKey: string) => {
 
 const BotDetailView: React.FC<BotDetailViewProps> = ({ bot, theme = 'dark', onBack }) => {
   return (
-    <div className={`min-h-screen animate-in overflow-x-hidden transition-colors duration-500 ${theme === 'dark' ? 'bg-black text-white' : 'bg-slate-50 text-slate-900'}`}>
-      {/* Hero Banner */}
+    <div className={`min-h-screen animate-in overflow-x-hidden transition-colors duration-500 ${theme !== 'light' ? 'bg-[var(--bg-color)] text-white' : 'bg-slate-50 text-slate-900'}`}>
       <div className="relative h-[40vh] md:h-[50vh] overflow-hidden">
         <img 
           src={bot.bannerUrl} 
@@ -94,10 +91,10 @@ const BotDetailView: React.FC<BotDetailViewProps> = ({ bot, theme = 'dark', onBa
             (e.target as HTMLImageElement).style.display = 'none';
           }}
         />
-        <div className={`absolute inset-0 bg-gradient-to-t via-transparent to-transparent ${theme === 'dark' ? 'from-black' : 'from-slate-50'}`}></div>
+        <div className={`absolute inset-0 bg-gradient-to-t via-transparent to-transparent ${theme !== 'light' ? 'from-[var(--bg-color)]' : 'from-slate-50'}`}></div>
         <button 
           onClick={onBack}
-          className={`absolute top-10 left-10 p-4 rounded-2xl transition-all z-20 backdrop-blur-xl border flex items-center gap-3 font-black text-[10px] uppercase tracking-widest ${theme === 'dark' ? 'bg-white/5 hover:bg-white/10 text-white border-white/10' : 'bg-white/80 hover:bg-white text-slate-900 border-slate-200 shadow-sm'}`}
+          className={`absolute top-10 left-10 p-4 rounded-2xl transition-all z-20 backdrop-blur-xl border flex items-center gap-3 font-black text-[10px] uppercase tracking-widest ${theme !== 'light' ? 'bg-white/5 hover:bg-white/10 text-white border-white/10' : 'bg-white/80 hover:bg-white text-slate-900 border-slate-200 shadow-sm'}`}
         >
           <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -108,7 +105,7 @@ const BotDetailView: React.FC<BotDetailViewProps> = ({ bot, theme = 'dark', onBa
 
       <div className="max-w-7xl mx-auto px-6 -mt-32 relative z-10 pb-32">
         <div className="flex flex-col lg:flex-row items-center lg:items-end gap-12 mb-20 text-center lg:text-left">
-          <div className={`w-56 h-56 md:w-72 md:h-72 rounded-[3.5rem] border-[16px] shadow-[0_30px_100px_rgba(0,0,0,0.5)] overflow-hidden relative group ${theme === 'dark' ? 'border-black bg-black' : 'border-slate-50 bg-white shadow-xl'}`}>
+          <div className={`w-56 h-56 md:w-72 md:h-72 rounded-[3.5rem] border-[16px] shadow-[0_30px_100px_rgba(0,0,0,0.5)] overflow-hidden relative group ${theme !== 'light' ? 'border-[var(--bg-color)] bg-slate-900' : 'border-slate-50 bg-white shadow-xl'}`}>
             <img 
               src={bot.imageUrl} 
               alt={bot.name} 
@@ -119,9 +116,9 @@ const BotDetailView: React.FC<BotDetailViewProps> = ({ bot, theme = 'dark', onBa
             />
           </div>
           <div className="flex-1 pb-4">
-            <h1 className={`text-6xl md:text-[9rem] font-black mb-6 tracking-tighter leading-none ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>{bot.name}</h1>
+            <h1 className={`text-6xl md:text-[9rem] font-black mb-6 tracking-tighter leading-none ${theme !== 'light' ? 'text-white' : 'text-slate-900'}`}>{bot.name}</h1>
             <div className="flex flex-wrap justify-center lg:justify-start gap-4">
-               <span className="px-6 py-2 rounded-full bg-indigo-600/20 border border-indigo-600/30 text-indigo-400 font-black text-[10px] uppercase tracking-widest">
+               <span className="px-6 py-2 rounded-full bg-[var(--brand-color)]/20 border border-[var(--brand-color)]/30 text-[var(--brand-color)] font-black text-[10px] uppercase tracking-widest">
                   Verified Instance
                </span>
                <span className="px-6 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 font-black text-[10px] uppercase tracking-widest">
@@ -134,7 +131,7 @@ const BotDetailView: React.FC<BotDetailViewProps> = ({ bot, theme = 'dark', onBa
                href={bot.inviteUrl}
                target="_blank"
                rel="noopener noreferrer"
-               className="px-12 py-6 rounded-2xl font-black text-sm uppercase tracking-widest bg-[#5865F2] text-white shadow-2xl hover:bg-indigo-500 hover:-translate-y-1 transition-all block text-center"
+               className="px-12 py-6 rounded-2xl font-black text-sm uppercase tracking-widest bg-[var(--brand-color)] text-white shadow-2xl hover:bg-indigo-500 hover:-translate-y-1 transition-all block text-center"
              >
                 Add to Discord
              </a>
@@ -143,28 +140,28 @@ const BotDetailView: React.FC<BotDetailViewProps> = ({ bot, theme = 'dark', onBa
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           <div className="lg:col-span-2 space-y-12">
-            <section className={`rounded-[3rem] p-12 border reveal reveal-up ${theme === 'dark' ? 'glass border-white/5' : 'bg-white border-slate-200 shadow-md'}`}>
+            <section className={`rounded-[3rem] p-12 border reveal reveal-up ${theme !== 'light' ? 'bg-[#161a23]/50 border-white/5 backdrop-blur-md' : 'bg-white border-slate-200 shadow-md'}`}>
               <div className="flex items-center gap-6 mb-10">
-                <div className="w-1.5 h-10 bg-indigo-500 rounded-full"></div>
-                <h2 className={`text-4xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>System Architecture</h2>
+                <div className="w-1.5 h-10 bg-[var(--brand-color)] rounded-full"></div>
+                <h2 className={`text-4xl font-black tracking-tight ${theme !== 'light' ? 'text-white' : 'text-slate-900'}`}>System Architecture</h2>
               </div>
-              <p className={`text-lg md:text-xl leading-relaxed font-medium ${theme === 'dark' ? 'text-slate-300' : 'text-slate-600'}`}>
+              <p className={`text-lg md:text-xl leading-relaxed font-medium ${theme !== 'light' ? 'text-slate-300' : 'text-slate-600'}`}>
                 {bot.description}
               </p>
             </section>
 
-            <section className={`rounded-[3rem] p-12 border reveal reveal-up stagger-1 ${theme === 'dark' ? 'glass border-white/5' : 'bg-white border-slate-200 shadow-md'}`}>
+            <section className={`rounded-[3rem] p-12 border reveal reveal-up stagger-1 ${theme !== 'light' ? 'bg-[#161a23]/50 border-white/5 backdrop-blur-md' : 'bg-white border-slate-200 shadow-md'}`}>
               <div className="flex items-center gap-6 mb-12">
                 <div className="w-1.5 h-10 bg-emerald-500 rounded-full"></div>
-                <h2 className={`text-4xl font-black tracking-tight ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>Capabilities</h2>
+                <h2 className={`text-4xl font-black tracking-tight ${theme !== 'light' ? 'text-white' : 'text-slate-900'}`}>Capabilities</h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {bot.features.map((feature, idx) => (
-                  <div key={idx} className={`rounded-[2rem] p-8 border transition-all group/feat ${theme === 'dark' ? 'bg-white/5 border-white/5 hover:border-indigo-500/40 hover:bg-white/[0.07]' : 'bg-slate-50 border-slate-200 hover:border-indigo-500/20 hover:bg-white shadow-sm'}`}>
-                    <div className="w-14 h-14 text-indigo-500 mb-8 p-3 rounded-2xl bg-indigo-500/10 group-hover/feat:scale-105 group-hover/feat:rotate-[5deg] transition-all duration-300">
+                  <div key={idx} className={`rounded-[2rem] p-8 border transition-all group/feat ${theme !== 'light' ? 'bg-white/5 border-white/5 hover:border-[var(--brand-color)]/40 hover:bg-white/[0.07]' : 'bg-slate-50 border-slate-200 hover:border-[var(--brand-color)]/20 hover:bg-white shadow-sm'}`}>
+                    <div className="w-14 h-14 text-[var(--brand-color)] mb-8 p-3 rounded-2xl bg-[var(--brand-color)]/10 group-hover/feat:scale-105 group-hover/feat:rotate-[5deg] transition-all duration-300">
                       {getFeatureIcon(feature.title, feature.icon)}
                     </div>
-                    <h3 className={`text-xl font-black mb-4 leading-tight ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>{feature.title}</h3>
+                    <h3 className={`text-xl font-black mb-4 leading-tight ${theme !== 'light' ? 'text-white' : 'text-slate-900'}`}>{feature.title}</h3>
                     <p className="text-slate-500 text-sm font-bold leading-relaxed">{feature.description}</p>
                   </div>
                 ))}
@@ -173,22 +170,22 @@ const BotDetailView: React.FC<BotDetailViewProps> = ({ bot, theme = 'dark', onBa
           </div>
 
           <div className="space-y-12">
-            <section className={`rounded-[3rem] p-10 border reveal reveal-right ${theme === 'dark' ? 'glass border-indigo-500/10' : 'bg-white border-slate-200 shadow-md'}`}>
+            <section className={`rounded-[3rem] p-10 border reveal reveal-right ${theme !== 'light' ? 'bg-[#161a23]/50 border-[var(--brand-color)]/10 backdrop-blur-md' : 'bg-white border-slate-200 shadow-md'}`}>
               <h3 className="text-xl font-black mb-10 uppercase tracking-widest text-slate-500">Live Statistics</h3>
               <div className="space-y-8">
                 <div className="flex justify-between items-center group/stat">
-                  <span className="text-slate-400 font-black uppercase tracking-widest text-[10px] group-hover/stat:text-indigo-500 transition-colors">Active Servers</span>
-                  <span className={`font-black text-2xl ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>{bot.stats.servers}</span>
+                  <span className="text-slate-400 font-black uppercase tracking-widest text-[10px] group-hover/stat:text-[var(--brand-color)] transition-colors">Active Servers</span>
+                  <span className={`font-black text-2xl ${theme !== 'light' ? 'text-white' : 'text-slate-900'}`}>{bot.stats.servers}</span>
                 </div>
                 <div className="flex justify-between items-center group/stat">
-                  <span className="text-slate-400 font-black uppercase tracking-widest text-[10px] group-hover/stat:text-indigo-500 transition-colors">Total Users</span>
-                  <span className={`font-black text-2xl ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>{bot.stats.users}</span>
+                  <span className="text-slate-400 font-black uppercase tracking-widest text-[10px] group-hover/stat:text-[var(--brand-color)] transition-colors">Total Users</span>
+                  <span className={`font-black text-2xl ${theme !== 'light' ? 'text-white' : 'text-slate-900'}`}>{bot.stats.users}</span>
                 </div>
                 <div className="flex justify-between items-center group/stat">
-                  <span className="text-slate-400 font-black uppercase tracking-widest text-[10px] group-hover/stat:text-indigo-500 transition-colors">Unique API Commands</span>
-                  <span className={`font-black text-2xl ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>{bot.stats.commands}</span>
+                  <span className="text-slate-400 font-black uppercase tracking-widest text-[10px] group-hover/stat:text-[var(--brand-color)] transition-colors">Unique API Commands</span>
+                  <span className={`font-black text-2xl ${theme !== 'light' ? 'text-white' : 'text-slate-900'}`}>{bot.stats.commands}</span>
                 </div>
-                <div className={`h-px ${theme === 'dark' ? 'bg-white/5' : 'bg-slate-100'}`}></div>
+                <div className={`h-px ${theme !== 'light' ? 'bg-white/5' : 'bg-slate-100'}`}></div>
                 <div className="flex items-center gap-4 text-emerald-400 font-black text-[10px] uppercase tracking-widest mb-8">
                   <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
                   Service Status: 100%
@@ -198,7 +195,7 @@ const BotDetailView: React.FC<BotDetailViewProps> = ({ bot, theme = 'dark', onBa
                   href={bot.inviteUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="w-full py-6 rounded-2xl font-black text-xs uppercase tracking-[0.2em] bg-[#5865F2] text-white shadow-[0_15px_35px_rgba(88,101,242,0.4)] hover:bg-white hover:text-black hover:-translate-y-1 transition-all flex items-center justify-center gap-3 group/cta"
+                  className="w-full py-6 rounded-2xl font-black text-xs uppercase tracking-[0.2em] bg-[var(--brand-color)] text-white shadow-[0_15px_35px_var(--brand-glow)] hover:bg-white hover:text-black hover:-translate-y-1 transition-all flex items-center justify-center gap-3 group/cta"
                 >
                   <svg className="w-5 h-5 transition-transform group-hover/cta:scale-110" fill="currentColor" viewBox="0 0 24 24">
                     <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037 19.736 19.736 0 0 0-4.885 1.515.069.069 0 0 0-.032.027C.533 9.048-.32 13.572.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/>
@@ -208,12 +205,12 @@ const BotDetailView: React.FC<BotDetailViewProps> = ({ bot, theme = 'dark', onBa
               </div>
             </section>
 
-            <section className={`rounded-[3rem] p-10 text-center border reveal reveal-right stagger-1 ${theme === 'dark' ? 'glass bg-indigo-600/5 border-indigo-500/10' : 'bg-indigo-50 border-indigo-100'}`}>
-              <h3 className={`text-xl font-black mb-6 ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>Support Hub</h3>
-              <p className={`font-bold mb-10 leading-relaxed text-sm ${theme === 'dark' ? 'text-slate-500' : 'text-slate-600'}`}>Need a custom feature or encountered a bug? Our devs are available in the support server.</p>
+            <section className={`rounded-[3rem] p-10 text-center border reveal reveal-right stagger-1 ${theme !== 'light' ? 'bg-[var(--brand-color)]/5 border-[var(--brand-color)]/10 backdrop-blur-md' : 'bg-indigo-50 border-indigo-100'}`}>
+              <h3 className={`text-xl font-black mb-6 ${theme !== 'light' ? 'text-white' : 'text-slate-900'}`}>Support Hub</h3>
+              <p className={`font-bold mb-10 leading-relaxed text-sm ${theme !== 'light' ? 'text-slate-500' : 'text-slate-600'}`}>Need a custom feature or encountered a bug? Our devs are available in the support server.</p>
               <button 
                 onClick={() => window.open(SUPPORT_SERVER_URL, '_blank')}
-                className={`w-full py-5 rounded-2xl border font-black text-[10px] transition-all uppercase tracking-widest active:scale-95 ${theme === 'dark' ? 'bg-white/5 border-white/10 text-white hover:bg-white/10' : 'bg-white border-slate-200 text-slate-900 hover:bg-slate-50 shadow-sm'}`}
+                className={`w-full py-5 rounded-2xl border font-black text-[10px] transition-all uppercase tracking-widest active:scale-95 ${theme !== 'light' ? 'bg-white/5 border-white/10 text-white hover:bg-white/10' : 'bg-white border-slate-200 text-slate-900 hover:bg-slate-50 shadow-sm'}`}
               >
                 Contact Developers
               </button>

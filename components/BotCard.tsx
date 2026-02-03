@@ -1,10 +1,10 @@
 
 import React, { useState } from 'react';
-import { BotInfo } from '../types';
+import { BotInfo, ThemeType } from '../types';
 
 interface BotCardProps {
   bot: BotInfo;
-  theme?: 'light' | 'dark';
+  theme?: ThemeType;
   onViewDetails: (bot: BotInfo) => void;
 }
 
@@ -19,7 +19,7 @@ const BotCard: React.FC<BotCardProps> = ({ bot, theme = 'dark', onViewDetails })
 
   return (
     <div 
-      className={`reveal group relative overflow-hidden rounded-2xl p-8 md:p-12 cursor-pointer transition-all duration-500 ease-out ${theme === 'dark' ? 'glass border-white/5 hover:border-indigo-500/40' : 'bg-white border border-slate-200 hover:border-indigo-500/20 shadow-md hover:shadow-2xl'} hover:-translate-y-2`}
+      className={`reveal group relative overflow-hidden rounded-2xl p-8 md:p-12 cursor-pointer transition-all duration-500 ease-out ${theme === 'black' ? 'bg-[#080808] border border-white/10 hover:border-[var(--brand-color)]/50' : theme !== 'light' ? 'bg-[#161a23] border border-white/5 hover:border-[var(--brand-color)]/40' : 'bg-white border border-slate-200 hover:border-[var(--brand-color)]/20 shadow-md hover:shadow-2xl'} hover:-translate-y-2`}
       onClick={() => onViewDetails(bot)}
     >
       <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.08] transition-all duration-700 select-none group-hover:rotate-6 group-hover:scale-110">
@@ -28,7 +28,7 @@ const BotCard: React.FC<BotCardProps> = ({ bot, theme = 'dark', onViewDetails })
 
       <div className="flex flex-col lg:flex-row items-center lg:items-center gap-10 relative z-10">
         <div className="relative group-hover:scale-105 transition-transform duration-500">
-          <div className={`w-32 h-32 md:w-44 md:h-44 rounded-2xl overflow-hidden ring-4 transition-all duration-500 shadow-2xl ${theme === 'dark' ? 'ring-white/5 group-hover:ring-indigo-500/30 bg-slate-900' : 'ring-slate-100 group-hover:ring-indigo-500/10 bg-slate-50'}`}>
+          <div className={`w-32 h-32 md:w-44 md:h-44 rounded-2xl overflow-hidden ring-4 transition-all duration-500 shadow-2xl ${theme === 'black' ? 'ring-white/10 bg-black' : theme !== 'light' ? 'ring-white/5 group-hover:ring-[var(--brand-color)]/30 bg-slate-900' : 'ring-slate-100 group-hover:ring-[var(--brand-color)]/10 bg-slate-50'}`}>
             <img 
               src={imgSrc} 
               alt={bot.name} 
@@ -37,39 +37,39 @@ const BotCard: React.FC<BotCardProps> = ({ bot, theme = 'dark', onViewDetails })
               loading="lazy"
             />
           </div>
-          <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-emerald-500 border-4 border-black rounded-full flex items-center justify-center">
+          <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-emerald-500 border-4 border-current rounded-full flex items-center justify-center" style={{ borderColor: theme === 'black' ? '#080808' : '#161a23' }}>
             <div className="w-2 h-2 bg-white rounded-full animate-pulse"></div>
           </div>
         </div>
         
         <div className="flex-1 text-center lg:text-left">
           <div className="flex flex-col lg:flex-row lg:items-center gap-4 mb-4 justify-center lg:justify-start">
-            <h3 className={`text-4xl md:text-5xl font-black group-hover:text-indigo-400 transition-colors tracking-tighter ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>
+            <h3 className={`text-4xl md:text-5xl font-black group-hover:text-[var(--brand-color)] transition-colors tracking-tighter ${theme !== 'light' ? 'text-white' : 'text-slate-900'}`}>
               {bot.name}
             </h3>
-            <span className={`px-3 py-1 rounded-lg border text-[8px] font-black tracking-widest uppercase inline-block ${theme === 'dark' ? 'bg-white/5 border-white/10 text-slate-500' : 'bg-slate-50 border-slate-200 text-slate-400'}`}>
+            <span className={`px-3 py-1 rounded-lg border text-[8px] font-black tracking-widest uppercase inline-block ${theme === 'black' ? 'bg-white/10 border-white/20 text-slate-300' : theme !== 'light' ? 'bg-white/5 border-white/10 text-slate-500' : 'bg-slate-50 border-slate-200 text-slate-400'}`}>
               {bot.tagline}
             </span>
           </div>
           
-          <p className={`text-sm md:text-base leading-relaxed mb-8 max-w-xl mx-auto lg:mx-0 font-medium transition-opacity ${theme === 'dark' ? 'text-slate-400 opacity-80 group-hover:opacity-100' : 'text-slate-600'}`}>
+          <p className={`text-sm md:text-base leading-relaxed mb-8 max-w-xl mx-auto lg:mx-0 font-medium transition-opacity ${theme === 'black' ? 'text-slate-300 opacity-90 group-hover:opacity-100' : theme !== 'light' ? 'text-slate-400 opacity-80 group-hover:opacity-100' : 'text-slate-600'}`}>
             {bot.description}
           </p>
           
           <div className="grid grid-cols-2 gap-8 mb-8 max-w-xs mx-auto lg:mx-0">
             <div>
               <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1">Guilds</p>
-              <p className={`text-lg font-black group-hover:text-indigo-300 transition-colors ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>{bot.stats.servers}</p>
+              <p className={`text-lg font-black group-hover:text-[var(--brand-color)] transition-colors ${theme !== 'light' ? 'text-white' : 'text-slate-900'}`}>{bot.stats.servers}</p>
             </div>
             <div>
               <p className="text-[8px] font-black text-slate-500 uppercase tracking-widest mb-1">Users</p>
-              <p className={`text-lg font-black group-hover:text-indigo-300 transition-colors ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>{bot.stats.users}</p>
+              <p className={`text-lg font-black group-hover:text-[var(--brand-color)] transition-colors ${theme !== 'light' ? 'text-white' : 'text-slate-900'}`}>{bot.stats.users}</p>
             </div>
           </div>
 
           <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-3">
              <button 
-               className="px-8 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all bg-[#5865F2] text-white hover:bg-white hover:text-black active:scale-95 shadow-lg group/btn"
+               className={`px-8 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all bg-[var(--brand-color)] hover:bg-white hover:text-black active:scale-95 shadow-lg group/btn ${theme === 'black' ? 'text-black' : 'text-white'}`}
                onClick={(e) => {
                  e.stopPropagation();
                  onViewDetails(bot);
@@ -85,7 +85,7 @@ const BotCard: React.FC<BotCardProps> = ({ bot, theme = 'dark', onViewDetails })
                onClick={(e) => e.stopPropagation()}
                target="_blank"
                rel="noopener noreferrer"
-               className={`px-8 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all border text-center ${theme === 'dark' ? 'border-white/10 hover:bg-white/5 text-slate-400 hover:text-white' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'}`}
+               className={`px-8 py-3.5 rounded-xl font-black text-[10px] uppercase tracking-widest transition-all border text-center ${theme !== 'light' ? 'border-white/10 hover:bg-white/5 text-slate-400 hover:text-white' : 'border-slate-200 bg-white text-slate-600 hover:bg-slate-50'}`}
              >
                Add Bot
              </a>

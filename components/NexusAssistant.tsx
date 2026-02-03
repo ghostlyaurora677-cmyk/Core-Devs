@@ -41,7 +41,7 @@ const NexusAssistant: React.FC = () => {
       {/* Toggle Button */}
       <button 
         onClick={() => setIsOpen(!isOpen)}
-        className={`w-16 h-16 rounded-full flex items-center justify-center shadow-2xl transition-all duration-500 group ${isOpen ? 'bg-red-500 rotate-90' : 'bg-[#5865F2] hover:scale-110'}`}
+        className={`w-16 h-16 rounded-full flex items-center justify-center shadow-2xl transition-all duration-500 group ${isOpen ? 'bg-red-500 rotate-90' : 'bg-[var(--brand-color)] hover:scale-110'}`}
       >
         {isOpen ? (
           <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -62,7 +62,7 @@ const NexusAssistant: React.FC = () => {
         <div className="absolute bottom-20 right-0 w-[350px] md:w-[400px] h-[550px] glass rounded-[2.5rem] border-white/10 shadow-[0_30px_100px_rgba(0,0,0,0.5)] flex flex-col overflow-hidden animate-in slide-in-from-bottom-5">
           {/* Header */}
           <div className="p-6 border-b border-white/5 bg-white/5 flex items-center gap-4">
-            <div className="w-10 h-10 rounded-xl bg-indigo-600 flex items-center justify-center font-black text-white text-xs">CD</div>
+            <div className="w-10 h-10 rounded-xl bg-[var(--brand-color)] flex items-center justify-center font-black text-white text-xs">CD</div>
             <div>
               <h3 className="text-xs font-black text-white uppercase tracking-widest">Nexus AI</h3>
               <div className="flex items-center gap-1.5">
@@ -78,7 +78,7 @@ const NexusAssistant: React.FC = () => {
               <div key={i} className={`flex ${m.role === 'user' ? 'justify-end' : 'justify-start'}`}>
                 <div className={`max-w-[85%] px-4 py-3 rounded-2xl text-xs leading-relaxed ${
                   m.role === 'user' 
-                  ? 'bg-indigo-600 text-white rounded-tr-none' 
+                  ? 'bg-[var(--brand-color)] text-white rounded-tr-none shadow-lg' 
                   : 'bg-white/5 text-slate-300 border border-white/5 rounded-tl-none'
                 }`}>
                   {m.text}
@@ -88,9 +88,9 @@ const NexusAssistant: React.FC = () => {
             {isTyping && (
               <div className="flex justify-start">
                 <div className="bg-white/5 px-4 py-3 rounded-2xl rounded-tl-none border border-white/5 flex gap-1">
-                  <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce"></div>
-                  <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce [animation-delay:0.2s]"></div>
-                  <div className="w-1.5 h-1.5 bg-indigo-400 rounded-full animate-bounce [animation-delay:0.4s]"></div>
+                  <div className="w-1.5 h-1.5 bg-[var(--brand-color)] rounded-full animate-bounce"></div>
+                  <div className="w-1.5 h-1.5 bg-[var(--brand-color)] rounded-full animate-bounce [animation-delay:0.2s]"></div>
+                  <div className="w-1.5 h-1.5 bg-[var(--brand-color)] rounded-full animate-bounce [animation-delay:0.4s]"></div>
                 </div>
               </div>
             )}
@@ -121,11 +121,11 @@ const NexusAssistant: React.FC = () => {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 placeholder="Type your message..."
-                className="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-indigo-500 transition-all"
+                className="flex-1 bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-xs text-white focus:outline-none focus:border-[var(--brand-color)] transition-all"
               />
               <button 
                 type="submit"
-                className="p-3 bg-indigo-600 text-white rounded-xl hover:bg-indigo-500 transition-all active:scale-90 shadow-lg shadow-indigo-600/20"
+                className="p-3 bg-[var(--brand-color)] text-white rounded-xl hover:opacity-90 transition-all active:scale-90 shadow-lg"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9-2-9-18-9 18 9-2zm0 0v-8" />

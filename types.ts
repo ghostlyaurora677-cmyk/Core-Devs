@@ -34,8 +34,20 @@ export interface Resource {
   createdAt: string;
 }
 
+export type FeedbackCategory = 'BUG' | 'SUGGESTION' | 'OTHER';
+
+export interface Feedback {
+  id: string;
+  type: FeedbackCategory;
+  message: string;
+  timestamp: string;
+  themeAtTime: string;
+}
+
 export interface User {
   username: string;
   avatar: string;
   isAdmin: boolean;
 }
+
+export type ThemeType = 'light' | 'dark' | 'magenta' | 'lime' | 'red' | 'black';

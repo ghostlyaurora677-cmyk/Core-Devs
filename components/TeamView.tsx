@@ -1,5 +1,6 @@
 
 import React, { useState } from 'react';
+import { ThemeType } from '../types';
 
 interface TeamMemberProps {
   member: {
@@ -10,7 +11,7 @@ interface TeamMemberProps {
     bio: string;
   };
   index: number;
-  theme?: 'light' | 'dark';
+  theme?: ThemeType;
 }
 
 const TeamMember: React.FC<TeamMemberProps> = ({ member, index, theme = 'dark' }) => {
@@ -23,9 +24,9 @@ const TeamMember: React.FC<TeamMemberProps> = ({ member, index, theme = 'dark' }
   };
 
   return (
-    <div className={`reveal reveal-scale stagger-${index + 1} rounded-[3rem] p-10 text-center group transition-all duration-500 w-full md:w-[400px] border ${theme === 'dark' ? 'glass border-white/5 hover:border-indigo-500/30' : 'bg-white border-slate-200 shadow-md hover:shadow-2xl hover:border-indigo-500/20'}`}>
+    <div className={`reveal reveal-scale stagger-${index + 1} rounded-[3rem] p-10 text-center group transition-all duration-500 w-full md:w-[400px] border ${theme !== 'light' ? 'glass border-white/5 hover:border-[var(--brand-color)]/30' : 'bg-white border-slate-200 shadow-md hover:shadow-2xl hover:border-[var(--brand-color)]/20'}`}>
       <div className="relative mb-8 inline-block">
-        <div className={`w-44 h-44 rounded-[2.5rem] mx-auto overflow-hidden ring-4 transition-all shadow-2xl ${theme === 'dark' ? 'ring-white/5 group-hover:ring-indigo-500/20 bg-slate-900' : 'ring-slate-100 group-hover:ring-indigo-500/10 bg-slate-50'}`}>
+        <div className={`w-44 h-44 rounded-[2.5rem] mx-auto overflow-hidden ring-4 transition-all shadow-2xl ${theme !== 'light' ? 'ring-white/5 group-hover:ring-[var(--brand-color)]/20 bg-slate-900' : 'ring-slate-100 group-hover:ring-[var(--brand-color)]/10 bg-slate-50'}`}>
           <img 
             src={imgSrc} 
             className="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500" 
@@ -34,26 +35,26 @@ const TeamMember: React.FC<TeamMemberProps> = ({ member, index, theme = 'dark' }
             loading="lazy"
           />
         </div>
-        <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-xl border-4 border-black group-hover:rotate-12 transition-transform">
+        <div className="absolute -bottom-2 -right-2 w-10 h-10 bg-[var(--brand-color)] rounded-2xl flex items-center justify-center shadow-xl border-4 border-[var(--bg-color)] group-hover:rotate-12 transition-transform">
            <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 24 24">
             <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037 19.736 19.736 0 0 0-4.885 1.515.069.069 0 0 0-.032.027C.533 9.048-.32 13.572.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/>
           </svg>
         </div>
       </div>
-      <h3 className={`text-3xl font-black mb-2 ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>{member.name}</h3>
-      <p className="text-indigo-500 font-black text-[10px] uppercase tracking-[0.3em] mb-6">{member.role}</p>
-      <p className={`text-sm leading-relaxed mb-8 px-4 font-medium h-20 overflow-hidden ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}>
+      <h3 className={`text-3xl font-black mb-2 ${theme !== 'light' ? 'text-white' : 'text-slate-900'}`}>{member.name}</h3>
+      <p className="text-[var(--brand-color)] font-black text-[10px] uppercase tracking-[0.3em] mb-6">{member.role}</p>
+      <p className={`text-sm leading-relaxed mb-8 px-4 font-medium h-20 overflow-hidden ${theme !== 'light' ? 'text-slate-400' : 'text-slate-600'}`}>
         {member.bio}
       </p>
-      <div className={`rounded-2xl py-4 px-6 inline-flex items-center gap-4 border transition-all ${theme === 'dark' ? 'bg-black/40 border-white/5 group-hover:border-indigo-500/20' : 'bg-slate-50 border-slate-200 group-hover:border-indigo-500/20 shadow-sm'}`}>
-        <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
-        <span className={`text-xs font-mono font-bold ${theme === 'dark' ? 'text-slate-300' : 'text-slate-700'}`}>{member.discord}</span>
+      <div className={`rounded-2xl py-4 px-6 inline-flex items-center gap-4 border transition-all ${theme !== 'light' ? 'bg-black/40 border-white/5 group-hover:border-[var(--brand-color)]/20' : 'bg-slate-50 border-slate-200 group-hover:border-[var(--brand-color)]/20 shadow-sm'}`}>
+        <span className="w-2 h-2 rounded-full bg-[var(--brand-color)] animate-pulse"></span>
+        <span className={`text-xs font-mono font-bold ${theme !== 'light' ? 'text-slate-300' : 'text-slate-700'}`}>{member.discord}</span>
       </div>
     </div>
   );
 };
 
-const TeamView: React.FC<{ onBack: () => void, theme?: 'light' | 'dark' }> = ({ onBack, theme = 'dark' }) => {
+const TeamView: React.FC<{ onBack: () => void, theme?: ThemeType }> = ({ onBack, theme = 'dark' }) => {
   const teamMembers = [
     { 
       name: 'Mandeep', 
@@ -72,13 +73,13 @@ const TeamView: React.FC<{ onBack: () => void, theme?: 'light' | 'dark' }> = ({ 
   ];
 
   return (
-    <div className={`min-h-screen animate-in fade-in duration-500 pb-32 transition-colors duration-500 ${theme === 'dark' ? 'bg-black text-white' : 'bg-slate-50 text-slate-900'}`}>
+    <div className={`min-h-screen animate-in fade-in duration-500 pb-32 transition-colors duration-500 ${theme !== 'light' ? 'bg-[var(--bg-color)] text-white' : 'bg-slate-50 text-slate-900'}`}>
       <div className="max-w-7xl mx-auto px-6 pt-32">
         <button 
           onClick={onBack}
-          className={`reveal active reveal-left mb-12 font-bold hover:text-indigo-500 transition-colors flex items-center gap-3 text-[10px] uppercase tracking-widest group ${theme === 'dark' ? 'text-slate-400' : 'text-slate-600'}`}
+          className={`reveal active reveal-left mb-12 font-bold hover:text-[var(--brand-color)] transition-colors flex items-center gap-3 text-[10px] uppercase tracking-widest group ${theme !== 'light' ? 'text-slate-400' : 'text-slate-600'}`}
         >
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center group-hover:-translate-x-1 transition-transform ${theme === 'dark' ? 'glass' : 'bg-white shadow-sm border border-slate-200'}`}>
+          <div className={`w-10 h-10 rounded-xl flex items-center justify-center group-hover:-translate-x-1 transition-transform ${theme !== 'light' ? 'glass' : 'bg-white shadow-sm border border-slate-200'}`}>
             <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
@@ -87,9 +88,9 @@ const TeamView: React.FC<{ onBack: () => void, theme?: 'light' | 'dark' }> = ({ 
         </button>
 
         <div className="reveal active reveal-down text-center mb-24">
-          <h1 className={`text-6xl md:text-[8rem] font-black mb-6 tracking-tighter uppercase leading-none ${theme === 'dark' ? 'text-white' : 'text-slate-900'}`}>The Team</h1>
-          <div className="w-24 h-2 bg-indigo-500 mx-auto rounded-full shadow-[0_0_20px_rgba(79,70,229,0.4)] mb-6"></div>
-          <p className="text-indigo-400 font-black uppercase tracking-[0.4em] text-[10px]">The Architects behind CORE DEVS</p>
+          <h1 className={`text-6xl md:text-[8rem] font-black mb-6 tracking-tighter uppercase leading-none ${theme !== 'light' ? 'text-white' : 'text-slate-900'}`}>The Team</h1>
+          <div className="w-24 h-2 bg-[var(--brand-color)] mx-auto rounded-full shadow-[0_0_20px_var(--brand-glow)] mb-6"></div>
+          <p className="text-[var(--brand-color)] font-black uppercase tracking-[0.4em] text-[10px]">The Architects behind CORE DEVS</p>
         </div>
 
         <div className="flex flex-wrap justify-center gap-10">
