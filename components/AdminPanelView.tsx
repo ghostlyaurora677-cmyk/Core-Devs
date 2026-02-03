@@ -17,6 +17,7 @@ interface AdminPanelViewProps {
 
 type SortOption = 'username' | 'role' | 'permissionsCount';
 type FilterOption = 'ALL' | StaffPermission;
+type StaffRole = 'Owner' | 'Manager' | 'Admin' | 'Staff';
 
 const AdminPanelView: React.FC<AdminPanelViewProps> = ({ 
   user, resources, feedbacks, onAdd, onUpdate, onDelete, onDeleteFeedback, onClearAllFeedback, onBack 
@@ -31,6 +32,7 @@ const AdminPanelView: React.FC<AdminPanelViewProps> = ({
   const [staffAccounts, setStaffAccounts] = useState<StaffAccount[]>([]);
   const [newStaffUsername, setNewStaffUsername] = useState('');
   const [newStaffPassword, setNewStaffPassword] = useState('');
+  const [newStaffRole, setNewStaffRole] = useState<StaffRole>('Staff');
   const [newStaffPermissions, setNewStaffPermissions] = useState<StaffPermission[]>(['VAULT_VIEW']);
   const [creationStatus, setCreationStatus] = useState<'idle' | 'success'>('idle');
 
@@ -41,6 +43,8 @@ const AdminPanelView: React.FC<AdminPanelViewProps> = ({
   const [formData, setFormData] = useState<Partial<Resource>>({
     title: '', description: '', type: 'API_KEY', content: '', tags: []
   });
+
+  const staffRoles: StaffRole[] = ['Owner', 'Manager', 'Admin', 'Staff'];
 
   // Permission verification helper
   const hasPermission = (perm: StaffPermission) => {
@@ -92,7 +96,7 @@ const AdminPanelView: React.FC<AdminPanelViewProps> = ({
       id: Math.random().toString(36).substr(2, 9),
       username: newStaffUsername,
       password: newStaffPassword,
-      role: 'Staff Personnel',
+      role: newStaffRole,
       permissions: newStaffPermissions
     };
     
@@ -100,6 +104,7 @@ const AdminPanelView: React.FC<AdminPanelViewProps> = ({
     setStaffAccounts([...staffAccounts, newAcc]);
     setNewStaffUsername('');
     setNewStaffPassword('');
+    setNewStaffRole('Staff');
     setNewStaffPermissions(['VAULT_VIEW']);
     setCreationStatus('success');
     setTimeout(() => setCreationStatus('idle'), 3000);
@@ -312,7 +317,7 @@ const AdminPanelView: React.FC<AdminPanelViewProps> = ({
               
               <h2 className="text-4xl font-black mb-12 uppercase tracking-tighter">Onboard Infrastructure Staff</h2>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-10 mb-12">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mb-12">
                 <div className="space-y-4">
                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] ml-1">Assigned Username</label>
                   <input className="w-full bg-white/5 border border-white/10 rounded-2xl px-8 py-6 focus:border-indigo-500 transition-all outline-none font-bold text-lg" placeholder="e.g. aditya_staff" value={newStaffUsername} onChange={e => setNewStaffUsername(e.target.value)} />
@@ -320,6 +325,18 @@ const AdminPanelView: React.FC<AdminPanelViewProps> = ({
                 <div className="space-y-4">
                   <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] ml-1">Access Passphrase</label>
                   <input className="w-full bg-white/5 border border-white/10 rounded-2xl px-8 py-6 focus:border-indigo-500 transition-all outline-none font-bold text-lg" type="password" placeholder="••••••••" value={newStaffPassword} onChange={e => setNewStaffPassword(e.target.value)} />
+                </div>
+                <div className="space-y-4">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] ml-1">Assigned Role</label>
+                  <select 
+                    value={newStaffRole}
+                    onChange={(e) => setNewStaffRole(e.target.value as StaffRole)}
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-8 py-6 focus:border-indigo-500 transition-all outline-none font-bold text-lg appearance-none cursor-pointer"
+                  >
+                    {staffRoles.map(role => (
+                      <option key={role} value={role}>{role}</option>
+                    ))}
+                  </select>
                 </div>
               </div>
 
