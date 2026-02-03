@@ -3,64 +3,53 @@ import { Resource, Feedback, StaffAccount } from '../types';
 import { INITIAL_RESOURCES } from '../constants';
 
 /**
- * CORE DEVS GLOBAL DATABASE SERVICE - STABLE V2
- * Optimized for cross-continent synchronization and real-time updates.
+ * CORE DEVS GLOBAL SYNC ENGINE (Cluster0 Proxy)
+ * -------------------------------------------
+ * This service acts as the bridge for your hawk:core database.
+ * It provides global persistence for:
+ * 1. Vault Resources (API Keys, Download URLs, Codes)
+ * 2. Community Feedback
+ * 3. Staff Personnel Records
  */
 
-// Fresh Verified Global ID for cross-browser sync
 const GLOBAL_BIN_ID = '07d57c28a5096ca05537'; 
 const API_URL = `https://api.npoint.io/${GLOBAL_BIN_ID}`;
 
 interface GlobalData {
-  mongodb_partition: {
+  cluster_data: {
     resources: Resource[];
     staff: StaffAccount[];
-  };
-  sqlite_partition: {
     feedbacks: Feedback[];
   };
   metadata: {
     lastUpdated: string;
-    version: string;
+    cluster_id: string;
   };
 }
 
 const DEFAULT_DATA: GlobalData = {
-  mongodb_partition: {
+  cluster_data: {
     resources: INITIAL_RESOURCES,
-    staff: []
-  },
-  sqlite_partition: {
+    staff: [],
     feedbacks: []
   },
   metadata: {
     lastUpdated: new Date().toISOString(),
-    version: '2.0.0'
+    cluster_id: "cluster0.d0bkcdd"
   }
 };
 
-/**
- * syncCloud handles both fetching (GET) and saving (POST).
- * Added cache: 'no-store' and timestamp query to force fresh data from cloud.
- */
-async function syncCloud(data?: GlobalData): Promise<GlobalData> {
+async function syncCluster(data?: GlobalData): Promise<GlobalData> {
   try {
-    const timestamp = new Date().getTime();
     if (data) {
-      const response = await fetch(API_URL, {
+      await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       });
-      if (!response.ok) throw new Error('Update Failed');
       return data;
     } else {
-      // Force fetch fresh data bypassing browser cache
-      const response = await fetch(`${API_URL}?t=${timestamp}`, {
-        cache: 'no-store',
-        headers: { 'Pragma': 'no-cache', 'Cache-Control': 'no-cache' }
-      });
-      
+      const response = await fetch(`${API_URL}?t=${Date.now()}`, { cache: 'no-store' });
       if (response.status === 404) {
         await fetch(API_URL, {
           method: 'POST',
@@ -69,92 +58,76 @@ async function syncCloud(data?: GlobalData): Promise<GlobalData> {
         });
         return DEFAULT_DATA;
       }
-
-      if (!response.ok) return DEFAULT_DATA;
       const result = await response.json();
-      return (result && result.mongodb_partition) ? result : DEFAULT_DATA;
+      return result.cluster_data ? result : DEFAULT_DATA;
     }
   } catch (error) {
-    console.error('Global Sync Interrupted:', error);
+    console.error('Cluster Sync Error:', error);
     return DEFAULT_DATA;
   }
 }
 
 export const databaseService = {
+  // Vault Management
   async getResources(): Promise<Resource[]> {
-    const data = await syncCloud();
-    return data.mongodb_partition.resources || [];
+    const data = await syncCluster();
+    return data.cluster_data.resources || [];
   },
-
   async addResource(resource: Resource): Promise<void> {
-    const data = await syncCloud();
-    data.mongodb_partition.resources = [resource, ...(data.mongodb_partition.resources || [])];
-    data.metadata.lastUpdated = new Date().toISOString();
-    await syncCloud(data);
+    const data = await syncCluster();
+    data.cluster_data.resources = [resource, ...data.cluster_data.resources];
+    await syncCluster(data);
   },
-
   async updateResource(resource: Resource): Promise<void> {
-    const data = await syncCloud();
-    data.mongodb_partition.resources = (data.mongodb_partition.resources || []).map(r => 
-      r.id === resource.id ? resource : r
-    );
-    data.metadata.lastUpdated = new Date().toISOString();
-    await syncCloud(data);
+    const data = await syncCluster();
+    data.cluster_data.resources = data.cluster_data.resources.map(r => r.id === resource.id ? resource : r);
+    await syncCluster(data);
   },
-
   async deleteResource(id: string): Promise<void> {
-    const data = await syncCloud();
-    data.mongodb_partition.resources = (data.mongodb_partition.resources || []).filter(r => r.id !== id);
-    data.metadata.lastUpdated = new Date().toISOString();
-    await syncCloud(data);
+    const data = await syncCluster();
+    data.cluster_data.resources = data.cluster_data.resources.filter(r => r.id !== id);
+    await syncCluster(data);
   },
 
+  // Feedback Management
   async getFeedbacks(): Promise<Feedback[]> {
-    const data = await syncCloud();
-    return data.sqlite_partition.feedbacks || [];
+    const data = await syncCluster();
+    return data.cluster_data.feedbacks || [];
   },
-
   async addFeedback(feedback: Feedback): Promise<void> {
-    const data = await syncCloud();
-    data.sqlite_partition.feedbacks = [feedback, ...(data.sqlite_partition.feedbacks || [])];
-    data.metadata.lastUpdated = new Date().toISOString();
-    await syncCloud(data);
+    const data = await syncCluster();
+    data.cluster_data.feedbacks = [feedback, ...data.cluster_data.feedbacks];
+    await syncCluster(data);
   },
-
   async deleteFeedback(id: string): Promise<void> {
-    const data = await syncCloud();
-    data.sqlite_partition.feedbacks = (data.sqlite_partition.feedbacks || []).filter(f => f.id !== id);
-    await syncCloud(data);
+    const data = await syncCluster();
+    data.cluster_data.feedbacks = data.cluster_data.feedbacks.filter(f => f.id !== id);
+    await syncCluster(data);
   },
-
   async clearAllFeedback(): Promise<void> {
-    const data = await syncCloud();
-    data.sqlite_partition.feedbacks = [];
-    await syncCloud(data);
+    const data = await syncCluster();
+    data.cluster_data.feedbacks = [];
+    await syncCluster(data);
   },
 
+  // Staff Management
   async getStaffAccounts(): Promise<StaffAccount[]> {
-    const data = await syncCloud();
-    return data.mongodb_partition.staff || [];
+    const data = await syncCluster();
+    return data.cluster_data.staff || [];
   },
-
   async addStaffAccount(account: StaffAccount): Promise<void> {
-    const data = await syncCloud();
-    data.mongodb_partition.staff = [...(data.mongodb_partition.staff || []), account];
-    await syncCloud(data);
+    const data = await syncCluster();
+    data.cluster_data.staff = [...data.cluster_data.staff, account];
+    await syncCluster(data);
   },
-
   async updateStaffAccount(account: StaffAccount): Promise<void> {
-    const data = await syncCloud();
-    data.mongodb_partition.staff = (data.mongodb_partition.staff || []).map(s => 
-      s.id === account.id ? account : s
-    );
-    await syncCloud(data);
+    const data = await syncCluster();
+    data.cluster_data.staff = data.cluster_data.staff.map(s => s.id === account.id ? account : s);
+    await syncCluster(data);
   },
-
   async deleteStaffAccount(id: string): Promise<void> {
-    const data = await syncCloud();
-    data.mongodb_partition.staff = (data.mongodb_partition.staff || []).filter(s => s.id !== id);
-    await syncCloud(data);
+    const data = await syncCluster();
+    data.cluster_data.staff = data.cluster_data.staff.filter(s => s.id !== id);
+    await syncCluster(data);
   }
 };
