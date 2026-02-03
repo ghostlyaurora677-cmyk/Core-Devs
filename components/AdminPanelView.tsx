@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Resource, ResourceType, Feedback, StaffAccount, User, StaffPermission, ThemeType } from '../types';
 import { databaseService } from '../services/databaseService';
@@ -30,7 +31,6 @@ const AdminPanelView: React.FC<AdminPanelViewProps> = ({
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
 
-  // Staff management state
   const [staffAccounts, setStaffAccounts] = useState<StaffAccount[]>([]);
   const [editingStaffId, setEditingStaffId] = useState<string | null>(null);
   const [newStaffUsername, setNewStaffUsername] = useState('');
@@ -166,7 +166,6 @@ const AdminPanelView: React.FC<AdminPanelViewProps> = ({
 
   return (
     <div className="max-w-7xl mx-auto px-6 py-12 pb-32 reveal active reveal-up">
-      {/* Dashboard Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-16">
         {stats.map((s, idx) => (
           <div key={idx} className={`glass p-8 rounded-[2.5rem] border shadow-2xl group hover:-translate-y-2 transition-all ${theme === 'light' ? 'bg-white border-slate-200' : 'border-white/5'}`}>
@@ -178,7 +177,6 @@ const AdminPanelView: React.FC<AdminPanelViewProps> = ({
       </div>
 
       <div className="flex flex-col lg:flex-row gap-12">
-        {/* Sidebar Nav */}
         <div className="lg:w-64 space-y-4 shrink-0">
           <p className="text-[10px] font-black uppercase tracking-[0.4em] text-indigo-500 mb-6 px-4 text-center lg:text-left">Navigation HQ</p>
           {[
@@ -201,7 +199,6 @@ const AdminPanelView: React.FC<AdminPanelViewProps> = ({
           ))}
         </div>
 
-        {/* Content Area */}
         <div className="flex-1 min-h-[600px]">
           {activeTab === 'assets' && (
             <div className="space-y-8 reveal active reveal-right">
@@ -237,9 +234,10 @@ const AdminPanelView: React.FC<AdminPanelViewProps> = ({
                           onChange={e => setFormData({...formData, type: e.target.value as ResourceType})} 
                           className={`${inputClasses} appearance-none cursor-pointer pr-12`}
                         >
-                          <option value="API_KEY" className="text-slate-900 bg-white">API Secret</option>
-                          <option value="CODE_SNIPPET" className="text-slate-900 bg-white">Logic Snippet</option>
-                          <option value="TOOL" className="text-slate-900 bg-white">External Node</option>
+                          {/* Aligned with Vault categories */}
+                          <option value="API_KEY" className="text-slate-900 bg-white">API KEY</option>
+                          <option value="CODE_SNIPPET" className="text-slate-900 bg-white">CODE SNIPPET</option>
+                          <option value="TOOL" className="text-slate-900 bg-white">TOOL</option>
                         </select>
                         <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500 group-hover:text-indigo-500 transition-colors">
                           <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -336,7 +334,6 @@ const AdminPanelView: React.FC<AdminPanelViewProps> = ({
                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">System Owner only access for personnel authorization</p>
               </div>
 
-              {/* Add/Edit Staff Form */}
               <div className={`glass p-10 rounded-[3rem] border mb-12 relative overflow-hidden ${theme === 'light' ? 'bg-white border-slate-200 shadow-xl' : 'border-white/10'}`}>
                 {creationStatus === 'success' && <div className="absolute top-0 left-0 w-full p-2 bg-emerald-500 text-black text-center font-black text-[10px] uppercase tracking-widest">New Operator Provisioned Successfully</div>}
                 {creationStatus === 'updated' && <div className="absolute top-0 left-0 w-full p-2 bg-indigo-500 text-white text-center font-black text-[10px] uppercase tracking-widest">Operator Signature Updated</div>}
@@ -390,7 +387,7 @@ const AdminPanelView: React.FC<AdminPanelViewProps> = ({
                         className={`p-6 rounded-2xl border cursor-pointer transition-all ${newStaffPermissions.includes(opt.id) ? 'bg-indigo-600/10 border-indigo-500/40 text-white' : theme === 'light' ? 'bg-slate-100 border-slate-300' : 'bg-white/5 border-white/5 text-slate-500'}`}
                       >
                         <div className="flex items-center gap-3 mb-2">
-                          <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${newStaffPermissions.includes(opt.id) ? 'bg-indigo-500 border-indigo-500' : 'border-slate-400'}`}>
+                          <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${newStaffPermissions.includes(opt.id) ? 'bg-indigo-50 border-indigo-500' : 'border-slate-400'}`}>
                             {newStaffPermissions.includes(opt.id) && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M5 13l4 4L19 7" /></svg>}
                           </div>
                           <span className={`text-[11px] font-black uppercase tracking-widest ${newStaffPermissions.includes(opt.id) ? (theme === 'light' ? 'text-indigo-600' : 'text-white') : 'text-slate-500'}`}>{opt.label}</span>
@@ -409,7 +406,6 @@ const AdminPanelView: React.FC<AdminPanelViewProps> = ({
                 </div>
               </div>
 
-              {/* Staff Roster List */}
               <div className="space-y-4">
                 <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] mb-4 ml-2">Active Personnel Records</h3>
                 {staffAccounts.length === 0 ? (

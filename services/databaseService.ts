@@ -3,12 +3,12 @@ import { Resource, Feedback, StaffAccount } from '../types';
 import { INITIAL_RESOURCES } from '../constants';
 
 /**
- * CORE DEVS GLOBAL DATABASE SERVICE - RECOVERY VERSION
- * Partitioned: MongoDB (Assets) & SQLite (Feedback)
+ * CORE DEVS GLOBAL DATABASE SERVICE - STABLE V2
+ * Optimized for cross-continent synchronization and real-time updates.
  */
 
 // Fresh Verified Global ID for cross-browser sync
-const GLOBAL_BIN_ID = '90d40236a2818619623e'; 
+const GLOBAL_BIN_ID = '07d57c28a5096ca05537'; 
 const API_URL = `https://api.npoint.io/${GLOBAL_BIN_ID}`;
 
 interface GlobalData {
@@ -35,29 +35,33 @@ const DEFAULT_DATA: GlobalData = {
   },
   metadata: {
     lastUpdated: new Date().toISOString(),
-    version: '1.2.0'
+    version: '2.0.0'
   }
 };
 
-// Robust sync helper that prevents "Cloud Pull Failed" from breaking the app
+/**
+ * syncCloud handles both fetching (GET) and saving (POST).
+ * Added cache: 'no-store' and timestamp query to force fresh data from cloud.
+ */
 async function syncCloud(data?: GlobalData): Promise<GlobalData> {
   try {
+    const timestamp = new Date().getTime();
     if (data) {
-      // Saving/Updating data
       const response = await fetch(API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data)
       });
-      if (!response.ok) console.error('Cloud Sync Update Delayed');
+      if (!response.ok) throw new Error('Update Failed');
       return data;
     } else {
-      // Fetching data
-      const response = await fetch(API_URL);
+      // Force fetch fresh data bypassing browser cache
+      const response = await fetch(`${API_URL}?t=${timestamp}`, {
+        cache: 'no-store',
+        headers: { 'Pragma': 'no-cache', 'Cache-Control': 'no-cache' }
+      });
       
       if (response.status === 404) {
-        // Bin doesn't exist yet, initialize it
-        console.warn('Database bin not found. Initializing storage...');
         await fetch(API_URL, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -66,29 +70,17 @@ async function syncCloud(data?: GlobalData): Promise<GlobalData> {
         return DEFAULT_DATA;
       }
 
-      if (!response.ok) {
-        console.warn('Cloud connection unstable, using local cache.');
-        return DEFAULT_DATA;
-      }
-
+      if (!response.ok) return DEFAULT_DATA;
       const result = await response.json();
-      
-      // Validation to ensure data structure is correct
-      if (!result || !result.mongodb_partition) {
-        return DEFAULT_DATA;
-      }
-      
-      return result;
+      return (result && result.mongodb_partition) ? result : DEFAULT_DATA;
     }
   } catch (error) {
-    // SILENT FAIL: Instead of crashing, we return the last known good state or defaults
-    console.error('Core Devs Database Offline:', error);
+    console.error('Global Sync Interrupted:', error);
     return DEFAULT_DATA;
   }
 }
 
 export const databaseService = {
-  // --- MONGODB PARTITION (Resources / Keys / Code) ---
   async getResources(): Promise<Resource[]> {
     const data = await syncCloud();
     return data.mongodb_partition.resources || [];
@@ -117,7 +109,6 @@ export const databaseService = {
     await syncCloud(data);
   },
 
-  // --- SQLITE PARTITION (Feedback / Community Logs) ---
   async getFeedbacks(): Promise<Feedback[]> {
     const data = await syncCloud();
     return data.sqlite_partition.feedbacks || [];
@@ -133,18 +124,15 @@ export const databaseService = {
   async deleteFeedback(id: string): Promise<void> {
     const data = await syncCloud();
     data.sqlite_partition.feedbacks = (data.sqlite_partition.feedbacks || []).filter(f => f.id !== id);
-    data.metadata.lastUpdated = new Date().toISOString();
     await syncCloud(data);
   },
 
   async clearAllFeedback(): Promise<void> {
     const data = await syncCloud();
     data.sqlite_partition.feedbacks = [];
-    data.metadata.lastUpdated = new Date().toISOString();
     await syncCloud(data);
   },
 
-  // --- SHARED STAFF ACCOUNTS ---
   async getStaffAccounts(): Promise<StaffAccount[]> {
     const data = await syncCloud();
     return data.mongodb_partition.staff || [];

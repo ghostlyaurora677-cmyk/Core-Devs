@@ -16,7 +16,6 @@ import { databaseService } from './services/databaseService';
 
 const FloatingIcons = () => (
   <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none">
-    {/* --- DISCORD ELEMENTS --- */}
     <div className="absolute top-[8%] left-[5%] pulse-soft scale-125 blur-[1px]">
       <svg className="w-16 h-16 text-fuchsia-500/20" fill="currentColor" viewBox="0 0 24 24">
         <path d="M12 2L4.5 11L12 22L19.5 11L12 2Z M12 6.5L16 11H8L12 6.5Z"/>
@@ -27,21 +26,9 @@ const FloatingIcons = () => (
         <path d="M12 2L16.5 6.5L12 11L7.5 6.5L12 2ZM12 13L16.5 17.5L12 22L7.5 17.5L12 13Z"/>
       </svg>
     </div>
-
-    {/* --- DEV LANGUAGES --- */}
     <div className="absolute top-[30%] left-[10%] spin-slow opacity-[0.04] blur-[3px]">
       <svg className="w-14 h-14 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
         <path d="M11.97 0c-2.38 0-2.22 1.02-2.22 1.02l.02 1.05h4.48v.63H8.05l-1.63.02C4.12 2.72 4 4.53 4 4.53L4 7.2h2.23V4.86c0-1.1 1.05-1.2 1.24-1.2h4.5c1.24 0 1.25 1.23 1.25 1.23v2.85h-3.32v.63h4.58s2.3-.08 2.3-2.22c0-2.13-1.83-2.13-1.83-2.13l-.97.02c-1.02 0-2 .01-2.01-4.01zm-5.4 3.7c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1zM11.97 24c2.38 0 2.22-1.02 2.22-1.02l-.02-1.05h-4.48v-.63h6.21l1.63-.02c2.3-.02 2.42-1.83 2.42-1.83L20 16.8h-2.23v2.34c0 1.1-1.05 1.2-1.24 1.2h-4.5c-1.24 0-1.25-1.23-1.25-1.23V16.3h3.32v-.63H9.52s-2.3.08-2.3 2.22c0 2.13 1.83 2.13 1.83 2.13l.97-.02c1.02 0 2-.01 2.01 4.01zm5.4-3.7c.55 0 1-.45 1-1s-.45-1-1-1-1 .45-1 1 .45-1 1-1z"/>
-      </svg>
-    </div>
-    <div className="absolute top-[28%] right-[15%] drifting opacity-[0.05] blur-[2px]">
-      <svg className="w-12 h-12 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M3 3h18v18H3V3zm11.525 12.835c.195.344.405.659.705.899.284.225.75.405 1.2.405.48 0 .825-.195 1.05-.405.21-.24.315-.51.315-.884 0-.585-.435-.855-.915-1.065l-.465-.21c-1.14-.495-1.89-.99-1.89-2.295 0-1.02.765-1.92 2.1-1.92 1.02 0 1.74.45 2.19 1.14l-1.35.855c-.21-.39-.495-.615-.84-.615-.33 0-.57.195-.57.51 0 .345.21.51.72.735l.435.195c1.455.63 2.16 1.185 2.16 2.52 0 1.395-1.035 2.31-2.58 2.31-1.425 0-2.31-.705-2.82-1.74l1.38-.855zM6.165 14.655c.21.36.465.659.81.854.345.225.75.3 1.155.3.69 0 1.14-.255 1.455-.675.24-.315.345-.66.345-1.395V8.85h1.725V13.74c0 1.62-.9 2.58-2.43 2.58-1.185 0-1.995-.495-2.55-1.32l1.485-.915z"/>
-      </svg>
-    </div>
-    <div className="absolute top-[45%] left-[3%] swing opacity-[0.04] blur-[3px]">
-      <svg className="w-10 h-10 text-red-500" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M12 2L4.5 11L12 22L19.5 11L12 2Z"/>
       </svg>
     </div>
     <div className="absolute top-[48%] right-[3%] float-slow opacity-[0.03] blur-[4px]">
@@ -79,13 +66,16 @@ const App: React.FC = () => {
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
+  const syncLatestData = async () => {
+    const resData = await databaseService.getResources();
+    const feedData = await databaseService.getFeedbacks();
+    setResources(resData || []);
+    setFeedbacks(feedData || []);
+  };
+
   useEffect(() => {
     async function init() {
-      const resData = await databaseService.getResources();
-      const feedData = await databaseService.getFeedbacks();
-      setResources(resData || []);
-      setFeedbacks(feedData || []);
-      
+      await syncLatestData();
       const sessionUser = sessionStorage.getItem('cd_user_session');
       if (sessionUser) {
         const parsedUser = JSON.parse(sessionUser) as User;
@@ -99,22 +89,22 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const root = document.documentElement;
-    let brandColor = '#5865F2'; // Discord Blurple
+    let brandColor = '#5865F2';
     let brandGlow = 'rgba(88, 101, 242, 0.4)';
     let bgColor = '#0b0e14';
 
     switch (theme) {
-      case 'light': // White Theme
+      case 'light':
         brandColor = '#5865F2'; 
         brandGlow = 'rgba(88, 101, 242, 0.2)'; 
         bgColor = '#ffffff'; 
         break;
-      case 'black': // OLED Theme
+      case 'black':
         brandColor = '#ffffff'; 
         brandGlow = 'rgba(255, 255, 255, 0.3)'; 
         bgColor = '#000000'; 
         break;
-      case 'dark': // Blue Theme (Default)
+      case 'dark':
       default:
         brandColor = '#5865F2'; 
         brandGlow = 'rgba(88, 101, 242, 0.4)'; 
@@ -175,6 +165,11 @@ const App: React.FC = () => {
     if (targetView === 'admin' && !isAdmin && !forceAdmin) {
       handleNavigate('login');
       return;
+    }
+
+    // Force data sync when visiting Vault or Admin
+    if (targetView === 'resources' || targetView === 'admin') {
+      syncLatestData();
     }
 
     const currentIndex = VIEW_ORDER[view] || 0;
@@ -249,25 +244,23 @@ const App: React.FC = () => {
             onDeleteFeedback={handleDeleteFeedback}
             onClearAllFeedback={handleClearAllFeedback}
             onBack={() => handleNavigate('home')} 
+            theme={theme}
           />
         ) : view === 'home' ? (
           <>
             <section className="px-6 py-32 lg:py-56 text-center relative overflow-hidden flex flex-col items-center justify-center min-h-[100vh]">
               <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[1000px] hero-gradient blur-[180px] -z-10 opacity-60 animate-pulse"></div>
-              
               <div className="reveal active reveal-down mb-12 md:mb-16">
                 <div className="inline-flex items-center gap-4 px-10 py-3 bg-[var(--brand-color)]/10 border border-[var(--brand-color)]/30 rounded-full backdrop-blur-2xl shadow-2xl scale-90 md:scale-100 group transition-all hover:bg-[var(--brand-color)]/20 hover:border-[var(--brand-color)]/50">
                    <div className="w-2 h-2 rounded-full bg-[var(--brand-color)] animate-ping"></div>
                    <span className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.7em] text-[var(--brand-color)] pl-1">Next-Gen Infrastructure</span>
                 </div>
               </div>
-
               <div className="relative mb-12 md:mb-16 reveal active reveal-scale stagger-1">
                 <h1 className="text-[16vw] md:text-[13rem] lg:text-[16rem] font-black tracking-tighter leading-[0.8] uppercase drop-shadow-[0_35px_60px_rgba(0,0,0,0.6)]">
                   CORE <span className="text-[var(--brand-color)] drop-shadow-[0_0_120px_var(--brand-glow)]">DEVS</span>
                 </h1>
               </div>
-
               <div className="reveal active reveal-up stagger-2 max-w-3xl lg:max-w-4xl mx-auto mb-16 md:mb-24 px-6">
                 <p className={`text-xl md:text-2xl lg:text-3xl font-medium leading-[1.3] tracking-tight text-slate-400 drop-shadow-sm`}>
                   Architecting the future of <span className={`${theme === 'light' ? 'text-slate-900' : 'text-white'} relative inline-block group font-bold`}>
@@ -276,7 +269,6 @@ const App: React.FC = () => {
                   </span> and providing exclusive free assets for the world's most <span className={`${theme === 'light' ? 'text-slate-900' : 'text-white'} italic font-bold`}>ambitious developers</span>.
                 </p>
               </div>
-              
               <div className="reveal active reveal-scale stagger-3 flex flex-col sm:flex-row justify-center gap-6 md:gap-8 w-full max-w-md md:max-w-none">
                 <button 
                   onClick={() => handleNavigate('resources')} 
@@ -308,7 +300,6 @@ const App: React.FC = () => {
                   </div>
                 </div>
               </div>
-
               <div className="relative group/scroll">
                 <div 
                   ref={scrollContainerRef}
