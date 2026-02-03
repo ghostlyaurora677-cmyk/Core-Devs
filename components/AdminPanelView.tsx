@@ -156,8 +156,12 @@ const AdminPanelView: React.FC<AdminPanelViewProps> = ({
 
   const inputClasses = `w-full border rounded-2xl px-6 py-4 outline-none focus:border-indigo-500 transition-all font-bold ${
     theme === 'light' 
-      ? 'bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400' 
+      ? 'bg-slate-100 border-slate-300 text-slate-900 placeholder:text-slate-500' 
       : 'bg-white/5 border-white/10 text-white placeholder:text-slate-600'
+  }`;
+
+  const labelClasses = `text-[10px] font-black uppercase tracking-widest ml-2 ${
+    theme === 'light' ? 'text-slate-600' : 'text-slate-500'
   }`;
 
   return (
@@ -188,7 +192,7 @@ const AdminPanelView: React.FC<AdminPanelViewProps> = ({
               className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all ${
                 activeTab === tab.id 
                 ? 'bg-indigo-600 text-white shadow-[0_0_30px_rgba(79,70,229,0.4)]' 
-                : theme === 'light' ? 'text-slate-500 hover:text-slate-900 hover:bg-slate-100' : 'text-slate-500 hover:text-white hover:bg-white/5'
+                : theme === 'light' ? 'text-slate-600 hover:text-slate-900 hover:bg-slate-200' : 'text-slate-500 hover:text-white hover:bg-white/5'
               }`}
             >
               <span className="text-lg">{tab.icon}</span>
@@ -217,7 +221,7 @@ const AdminPanelView: React.FC<AdminPanelViewProps> = ({
                 <div className={`glass p-10 rounded-[3rem] border mb-12 animate-in slide-in-from-top-4 duration-500 ${theme === 'light' ? 'bg-white border-slate-200 shadow-xl' : 'border-white/10'}`}>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                     <div className="space-y-3">
-                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">Display Name</label>
+                      <label className={labelClasses}>Display Name</label>
                       <input 
                         value={formData.title} 
                         onChange={e => setFormData({...formData, title: e.target.value})} 
@@ -226,16 +230,16 @@ const AdminPanelView: React.FC<AdminPanelViewProps> = ({
                       />
                     </div>
                     <div className="space-y-3">
-                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">Type Category</label>
+                      <label className={labelClasses}>Type Category</label>
                       <div className="relative group">
                         <select 
                           value={formData.type} 
                           onChange={e => setFormData({...formData, type: e.target.value as ResourceType})} 
                           className={`${inputClasses} appearance-none cursor-pointer pr-12`}
                         >
-                          <option value="API_KEY" className={theme === 'light' ? 'text-slate-900' : 'text-white bg-[#1a1c22]'}>API Secret</option>
-                          <option value="CODE_SNIPPET" className={theme === 'light' ? 'text-slate-900' : 'text-white bg-[#1a1c22]'}>Logic Snippet</option>
-                          <option value="TOOL" className={theme === 'light' ? 'text-slate-900' : 'text-white bg-[#1a1c22]'}>External Node</option>
+                          <option value="API_KEY" className="text-slate-900 bg-white">API Secret</option>
+                          <option value="CODE_SNIPPET" className="text-slate-900 bg-white">Logic Snippet</option>
+                          <option value="TOOL" className="text-slate-900 bg-white">External Node</option>
                         </select>
                         <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500 group-hover:text-indigo-500 transition-colors">
                           <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -246,7 +250,7 @@ const AdminPanelView: React.FC<AdminPanelViewProps> = ({
                     </div>
                   </div>
                   <div className="space-y-3 mb-8">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">Data Payload</label>
+                    <label className={labelClasses}>Data Payload</label>
                     <textarea 
                       value={formData.content} 
                       onChange={e => setFormData({...formData, content: e.target.value})} 
@@ -256,16 +260,16 @@ const AdminPanelView: React.FC<AdminPanelViewProps> = ({
                   </div>
                   <div className="flex flex-col sm:flex-row gap-4">
                     <button onClick={handleSaveResource} className="px-10 py-5 bg-indigo-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-500 transition-all shadow-xl shadow-indigo-600/20">Commit to Database</button>
-                    <button onClick={resetResourceForm} className={`px-10 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${theme === 'light' ? 'bg-slate-200 text-slate-600 hover:bg-slate-300' : 'glass hover:bg-white/10'}`}>Abort</button>
+                    <button onClick={resetResourceForm} className={`px-10 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${theme === 'light' ? 'bg-slate-200 text-slate-700 hover:bg-slate-300' : 'glass hover:bg-white/10'}`}>Abort</button>
                   </div>
                 </div>
               )}
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {resources.map(res => (
-                  <div key={res.id} className={`glass p-8 rounded-3xl border transition-all group ${theme === 'light' ? 'bg-white border-slate-200' : 'border-white/5 hover:border-[var(--brand-color)]/30'}`}>
+                  <div key={res.id} className={`glass p-8 rounded-3xl border transition-all group ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'border-white/5 hover:border-[var(--brand-color)]/30'}`}>
                     <div className="flex justify-between items-start mb-4">
-                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-xl group-hover:scale-110 transition-transform ${theme === 'light' ? 'bg-slate-50' : 'bg-white/5'}`}>
+                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-xl group-hover:scale-110 transition-transform ${theme === 'light' ? 'bg-slate-100' : 'bg-white/5'}`}>
                         {res.type === 'API_KEY' ? '🔑' : res.type === 'CODE_SNIPPET' ? '📜' : '🛠️'}
                       </div>
                       <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
@@ -275,7 +279,7 @@ const AdminPanelView: React.FC<AdminPanelViewProps> = ({
                     </div>
                     <h4 className={`text-xl font-black mb-1 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{res.title}</h4>
                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">Created: {res.createdAt}</p>
-                    <div className={`rounded-xl p-4 border font-mono text-[10px] text-slate-400 truncate ${theme === 'light' ? 'bg-slate-50 border-slate-100' : 'bg-black/40 border-white/5'}`}>
+                    <div className={`rounded-xl p-4 border font-mono text-[10px] text-slate-400 truncate ${theme === 'light' ? 'bg-slate-100 border-slate-300' : 'bg-black/40 border-white/5'}`}>
                       {res.content}
                     </div>
                   </div>
@@ -309,7 +313,7 @@ const AdminPanelView: React.FC<AdminPanelViewProps> = ({
                           {f.type === 'BUG' ? '🐞' : '💡'}
                         </div>
                         <div>
-                          <p className={`font-medium mb-3 ${theme === 'light' ? 'text-slate-700' : 'text-slate-300'}`}>{f.message}</p>
+                          <p className={`font-bold mb-3 ${theme === 'light' ? 'text-slate-800' : 'text-slate-300'}`}>{f.message}</p>
                           <div className="flex flex-wrap items-center gap-4 text-[9px] font-black uppercase tracking-widest text-slate-500">
                             <span>Type: <span className={f.type === 'BUG' ? 'text-red-400' : 'text-emerald-400'}>{f.type}</span></span>
                             <span>•</span>
@@ -341,7 +345,7 @@ const AdminPanelView: React.FC<AdminPanelViewProps> = ({
                 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
                   <div className="space-y-3">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">Operator ID (Username)</label>
+                    <label className={labelClasses}>Operator ID (Username)</label>
                     <input 
                       value={newStaffUsername} 
                       onChange={e => setNewStaffUsername(e.target.value)} 
@@ -350,7 +354,7 @@ const AdminPanelView: React.FC<AdminPanelViewProps> = ({
                     />
                   </div>
                   <div className="space-y-3">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">Digital Signature (Password)</label>
+                    <label className={labelClasses}>Digital Signature (Password)</label>
                     <input 
                       type="text"
                       value={newStaffPassword} 
@@ -362,13 +366,13 @@ const AdminPanelView: React.FC<AdminPanelViewProps> = ({
                 </div>
 
                 <div className="mb-8 space-y-3">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">Assigned Personnel Role</label>
+                  <label className={labelClasses}>Assigned Personnel Role</label>
                   <div className="flex flex-wrap gap-2">
                     {staffRoles.map(role => (
                       <button
                         key={role}
                         onClick={() => setNewStaffRole(role)}
-                        className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${newStaffRole === role ? 'bg-indigo-600 text-white border-indigo-500' : theme === 'light' ? 'bg-slate-50 text-slate-400 border-slate-200 hover:bg-slate-100' : 'bg-white/5 text-slate-400 border-white/10 hover:bg-white/10'}`}
+                        className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${newStaffRole === role ? 'bg-indigo-600 text-white border-indigo-500' : theme === 'light' ? 'bg-slate-100 text-slate-600 border-slate-300 hover:bg-slate-200 shadow-sm' : 'bg-white/5 text-slate-400 border-white/10 hover:bg-white/10'}`}
                       >
                         {role}
                       </button>
@@ -377,21 +381,21 @@ const AdminPanelView: React.FC<AdminPanelViewProps> = ({
                 </div>
 
                 <div className="mb-10 space-y-4">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">Security Clearance Matrix (Permissions)</label>
+                  <label className={labelClasses}>Security Clearance Matrix (Permissions)</label>
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     {PERMISSION_OPTS.map(opt => (
                       <div 
                         key={opt.id}
                         onClick={() => handleTogglePermission(opt.id)}
-                        className={`p-6 rounded-2xl border cursor-pointer transition-all ${newStaffPermissions.includes(opt.id) ? 'bg-indigo-600/10 border-indigo-500/40 text-white' : theme === 'light' ? 'bg-slate-50 border-slate-200' : 'bg-white/5 border-white/5 text-slate-500'}`}
+                        className={`p-6 rounded-2xl border cursor-pointer transition-all ${newStaffPermissions.includes(opt.id) ? 'bg-indigo-600/10 border-indigo-500/40 text-white' : theme === 'light' ? 'bg-slate-100 border-slate-300' : 'bg-white/5 border-white/5 text-slate-500'}`}
                       >
                         <div className="flex items-center gap-3 mb-2">
-                          <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${newStaffPermissions.includes(opt.id) ? 'bg-indigo-500 border-indigo-500' : 'border-white/20'}`}>
+                          <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${newStaffPermissions.includes(opt.id) ? 'bg-indigo-500 border-indigo-500' : 'border-slate-400'}`}>
                             {newStaffPermissions.includes(opt.id) && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M5 13l4 4L19 7" /></svg>}
                           </div>
                           <span className={`text-[11px] font-black uppercase tracking-widest ${newStaffPermissions.includes(opt.id) ? (theme === 'light' ? 'text-indigo-600' : 'text-white') : 'text-slate-500'}`}>{opt.label}</span>
                         </div>
-                        <p className="text-[9px] leading-relaxed opacity-60">{opt.desc}</p>
+                        <p className={`text-[9px] leading-relaxed opacity-70 ${theme === 'light' ? 'text-slate-700' : ''}`}>{opt.desc}</p>
                       </div>
                     ))}
                   </div>
@@ -401,7 +405,7 @@ const AdminPanelView: React.FC<AdminPanelViewProps> = ({
                   <button onClick={handleAddOrUpdateStaff} className="px-12 py-5 bg-indigo-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-500 transition-all shadow-xl shadow-indigo-600/20">
                     {editingStaffId ? 'Confirm Record Update' : 'Provision Operator'}
                   </button>
-                  {editingStaffId && <button onClick={resetStaffForm} className={`px-10 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${theme === 'light' ? 'bg-slate-200 text-slate-600 hover:bg-slate-300' : 'glass hover:bg-white/10'}`}>Abort Edit</button>}
+                  {editingStaffId && <button onClick={resetStaffForm} className={`px-10 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${theme === 'light' ? 'bg-slate-200 text-slate-700 hover:bg-slate-300' : 'glass hover:bg-white/10'}`}>Abort Edit</button>}
                 </div>
               </div>
 
@@ -416,15 +420,15 @@ const AdminPanelView: React.FC<AdminPanelViewProps> = ({
                   staffAccounts.map(staff => (
                     <div key={staff.id} className={`glass p-8 rounded-3xl border flex flex-col md:flex-row justify-between items-center group transition-all gap-6 ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'border-white/5 hover:border-indigo-500/30'}`}>
                       <div className="flex items-center gap-6 w-full">
-                        <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black transition-all shrink-0 ${theme === 'light' ? 'bg-indigo-600 text-white' : 'bg-indigo-600/20 text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white'}`}>{staff.username.charAt(0)}</div>
+                        <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black transition-all shrink-0 ${theme === 'light' ? 'bg-indigo-600 text-white shadow-lg' : 'bg-indigo-600/20 text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white'}`}>{staff.username.charAt(0)}</div>
                         <div className="flex-1">
                           <div className="flex items-center gap-3 mb-1">
                              <h4 className={`text-xl font-black ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{staff.username}</h4>
-                             <span className={`px-3 py-0.5 rounded-lg border text-[9px] font-black uppercase tracking-widest ${theme === 'light' ? 'bg-slate-50 border-slate-200 text-slate-500' : 'bg-white/5 border-white/10 text-slate-400'}`}>{staff.role}</span>
+                             <span className={`px-3 py-0.5 rounded-lg border text-[9px] font-black uppercase tracking-widest ${theme === 'light' ? 'bg-slate-100 border-slate-300 text-slate-700' : 'bg-white/5 border-white/10 text-slate-400'}`}>{staff.role}</span>
                           </div>
                           <div className="flex flex-wrap items-center gap-2">
                             {staff.permissions.map(p => (
-                              <span key={p} className={`text-[8px] font-black uppercase tracking-tighter px-2 py-0.5 rounded border ${theme === 'light' ? 'bg-indigo-50 border-indigo-100 text-indigo-600' : 'bg-indigo-500/10 text-indigo-400 border-indigo-500/10'}`}>
+                              <span key={p} className={`text-[8px] font-black uppercase tracking-tighter px-2 py-0.5 rounded border ${theme === 'light' ? 'bg-indigo-50 border-indigo-200 text-indigo-700' : 'bg-indigo-500/10 text-indigo-400 border-indigo-500/10'}`}>
                                 {PERMISSION_OPTS.find(o => o.id === p)?.label || p}
                               </span>
                             ))}
@@ -433,10 +437,10 @@ const AdminPanelView: React.FC<AdminPanelViewProps> = ({
                         </div>
                       </div>
                       <div className="flex items-center gap-2 md:opacity-0 group-hover:opacity-100 transition-all">
-                        <button onClick={() => startEditStaff(staff)} className={`p-4 rounded-xl transition-all ${theme === 'light' ? 'hover:bg-slate-100 text-slate-400 hover:text-indigo-600' : 'hover:bg-white/5 text-slate-500 hover:text-indigo-400'}`} title="Rename/Edit">
+                        <button onClick={() => startEditStaff(staff)} className={`p-4 rounded-xl transition-all ${theme === 'light' ? 'hover:bg-slate-100 text-slate-600 hover:text-indigo-600' : 'hover:bg-white/5 text-slate-500 hover:text-indigo-400'}`} title="Rename/Edit">
                           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-5M18.364 5.364l-1.06 1.06m0 0l-1.061-1.06m1.06 1.06l1.06 1.06m-1.06-1.06l1.061 1.06M15 7l3 3" /></svg>
                         </button>
-                        <button onClick={() => deleteStaff(staff.id)} className={`p-4 rounded-xl transition-all ${theme === 'light' ? 'hover:bg-slate-100 text-slate-400 hover:text-red-500' : 'hover:bg-white/5 text-slate-500 hover:text-red-500'}`} title="Delete Operator">
+                        <button onClick={() => deleteStaff(staff.id)} className={`p-4 rounded-xl transition-all ${theme === 'light' ? 'hover:bg-slate-100 text-slate-600 hover:text-red-600' : 'hover:bg-white/5 text-slate-500 hover:text-red-500'}`} title="Delete Operator">
                           <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
                         </button>
                       </div>
