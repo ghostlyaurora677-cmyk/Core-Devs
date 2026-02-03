@@ -5,8 +5,8 @@ import { Resource, ThemeType, User } from '../types';
 interface ResourceCardProps {
   resource: Resource;
   theme?: ThemeType;
-  user: User | null;
-  onLoginRequest: () => void;
+  user?: User | null;
+  onLoginRequest?: () => void;
 }
 
 const IconMap = {
@@ -34,7 +34,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource, theme = 'dark', u
 
   const handleAction = () => {
     if (!user) {
-      onLoginRequest();
+      if (onLoginRequest) onLoginRequest();
       return;
     }
     if (resource.type === 'TOOL') {
@@ -87,11 +87,13 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource, theme = 'dark', u
             </div>
           ) : (
             <div 
-              onClick={onLoginRequest}
-              className={`rounded-2xl p-5 flex flex-col items-center justify-center gap-2 border border-dashed cursor-pointer hover:bg-white/5 transition-all min-h-[100px] ${theme !== 'light' ? 'bg-black/40 border-white/10' : 'bg-slate-50 border-slate-300'}`}
+              onClick={handleAction}
+              className={`rounded-2xl p-8 flex flex-col items-center justify-center gap-3 border border-dashed cursor-pointer transition-all min-h-[100px] hover:bg-indigo-600/5 ${theme !== 'light' ? 'bg-black/40 border-white/10' : 'bg-slate-50 border-slate-300'}`}
             >
-              <svg className="w-5 h-5 text-[var(--brand-color)] animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 00-2 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[var(--brand-color)]">Auth Required to View</span>
+              <svg className="w-6 h-6 text-indigo-500 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 00-2 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400">Login to Access Infrastructure</span>
             </div>
           )}
           
@@ -129,7 +131,7 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource, theme = 'dark', u
                 ) : (
                   <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
                     <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
-                    <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002-2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
+                    <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002 2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
                   </svg>
                 )}
               </button>

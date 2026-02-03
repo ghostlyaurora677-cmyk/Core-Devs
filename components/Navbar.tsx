@@ -8,15 +8,14 @@ interface NavbarProps {
   theme: ThemeType;
   setTheme: (t: ThemeType) => void;
   isAdmin: boolean;
+  onOpenFeedback: () => void;
   user: User | null;
   onLogout: () => void;
-  onOpenFeedback: () => void;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, theme, setTheme, isAdmin, user, onLogout, onOpenFeedback }) => {
+const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, theme, setTheme, isAdmin, onOpenFeedback, user, onLogout }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isThemeMenuOpen, setIsThemeMenuOpen] = useState(false);
-  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
 
   const scrollToSection = (id: string) => {
     setIsMobileMenuOpen(false);
@@ -89,6 +88,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, theme, setThem
             className={`hidden sm:flex w-10 h-10 rounded-xl items-center justify-center transition-all active:scale-90 border ${
               theme !== 'light' ? 'bg-white/5 border-white/10 text-slate-400 hover:text-white hover:bg-white/10' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
             }`}
+            title="Send Feedback"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z" />
@@ -99,12 +99,14 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, theme, setThem
             <button 
               onClick={() => setIsThemeMenuOpen(!isThemeMenuOpen)}
               className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center transition-all active:scale-90 shadow-xl"
+              aria-label="Toggle Theme"
             >
               <div 
                 className={`w-4 h-4 rounded-full ring-2 transition-all duration-500 ${theme === 'black' ? 'ring-white/40' : 'ring-black/10'}`} 
                 style={{ backgroundColor: getActiveThemeColor() }}
               ></div>
             </button>
+            
             {isThemeMenuOpen && (
               <div className="absolute top-14 right-0 glass rounded-3xl p-3 border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.5)] animate-in zoom-in-95 duration-200 origin-top-right z-[100]">
                 <div className="flex flex-col gap-3">
@@ -114,6 +116,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, theme, setThem
                       onClick={() => { setTheme(opt.value); setIsThemeMenuOpen(false); }}
                       className={`w-8 h-8 rounded-full transition-all flex items-center justify-center border-2 ${theme === opt.value ? 'border-white scale-110 shadow-[0_0_15px_rgba(255,255,255,0.3)]' : 'border-white/20 hover:scale-110 hover:border-white/40'}`}
                       style={{ backgroundColor: opt.color }}
+                      title={opt.value}
                     />
                   ))}
                 </div>
@@ -124,44 +127,22 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, theme, setThem
           <div className="h-8 w-px bg-white/10 hidden sm:block mx-1"></div>
 
           {user ? (
-            <div className="relative">
-              <button 
-                onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-                className="flex items-center gap-3 p-1 pr-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
-              >
-                <div className="w-8 h-8 rounded-lg bg-[var(--brand-color)] overflow-hidden">
-                  <img src={user.avatar || `https://ui-avatars.com/api/?name=${user.username}&background=5865F2&color=fff`} className="w-full h-full object-cover" alt="User" />
-                </div>
-                <span className="text-[10px] font-black uppercase tracking-widest text-white hidden lg:block">{user.username}</span>
-              </button>
-              {isUserMenuOpen && (
-                <div className="absolute top-14 right-0 w-48 glass rounded-2xl p-2 border border-white/10 shadow-2xl animate-in zoom-in-95 duration-200 origin-top-right">
-                  <button 
-                    onClick={onLogout}
-                    className="w-full p-3 rounded-xl text-left text-[10px] font-black uppercase tracking-widest text-red-400 hover:bg-red-500/10 flex items-center gap-2"
-                  >
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-                    Logout
-                  </button>
-                </div>
-              )}
-            </div>
+            <button 
+              onClick={onLogout}
+              className="px-5 py-2.5 rounded-xl bg-red-600/10 border border-red-500/20 text-red-400 font-black text-[10px] uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all flex items-center gap-2 active:scale-95"
+            >
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
+              Logout
+            </button>
           ) : (
             <button 
               onClick={() => onNavigate('login')}
-              className="px-4 py-2.5 rounded-xl bg-[var(--brand-color)] font-black text-[10px] uppercase tracking-widest text-white shadow-lg shadow-[var(--brand-glow)] hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
+              className="px-5 py-2.5 rounded-xl bg-indigo-600 font-black text-[10px] uppercase tracking-widest text-white shadow-lg shadow-indigo-500/20 hover:scale-105 active:scale-95 transition-all flex items-center gap-2"
             >
               <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-              Login / Register
+              Staff Login
             </button>
           )}
-
-          <button 
-            onClick={() => onNavigate('admin')}
-            className={`px-4 py-2.5 rounded-xl border font-black text-[10px] uppercase tracking-widest transition-all flex items-center gap-2 active:scale-95 ${currentView === 'admin' ? 'bg-[var(--brand-color)] border-[var(--brand-color)] text-white shadow-lg' : 'bg-white/5 border-white/10 text-slate-400 hover:bg-white/10'}`}
-          >
-            {isAdmin ? 'ADMIN' : 'STAFF'}
-          </button>
 
           <button 
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}

@@ -1,10 +1,11 @@
 
-import { Resource, Feedback } from '../types';
+import { Resource, Feedback, StaffAccount } from '../types';
 import { INITIAL_RESOURCES } from '../constants';
 
-const DATA_KEY = 'coredevs_vault_v6_stable';
-const FEEDBACK_KEY = 'coredevs_feedback_v1';
-const INIT_KEY = 'coredevs_vault_initialized_v6';
+const DATA_KEY = 'coredevs_vault_v7';
+const FEEDBACK_KEY = 'coredevs_feedback_v2';
+const STAFF_KEY = 'coredevs_staff_v1';
+const INIT_KEY = 'coredevs_vault_init_v7';
 
 export const databaseService = {
   async getResources(): Promise<Resource[]> {
@@ -38,7 +39,6 @@ export const databaseService = {
     localStorage.setItem(DATA_KEY, JSON.stringify(current.filter(r => r.id !== id)));
   },
 
-  // Feedback Methods
   async getFeedbacks(): Promise<Feedback[]> {
     try {
       const data = localStorage.getItem(FEEDBACK_KEY);
@@ -60,5 +60,25 @@ export const databaseService = {
 
   async clearAllFeedback(): Promise<void> {
     localStorage.removeItem(FEEDBACK_KEY);
+  },
+
+  // Staff Management
+  async getStaffAccounts(): Promise<StaffAccount[]> {
+    try {
+      const data = localStorage.getItem(STAFF_KEY);
+      return data ? JSON.parse(data) : [];
+    } catch (e) {
+      return [];
+    }
+  },
+
+  async addStaffAccount(account: StaffAccount): Promise<void> {
+    const current = await this.getStaffAccounts();
+    localStorage.setItem(STAFF_KEY, JSON.stringify([...current, account]));
+  },
+
+  async deleteStaffAccount(id: string): Promise<void> {
+    const current = await this.getStaffAccounts();
+    localStorage.setItem(STAFF_KEY, JSON.stringify(current.filter(s => s.id !== id)));
   }
 };

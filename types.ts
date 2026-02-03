@@ -44,12 +44,24 @@ export interface Feedback {
   themeAtTime: string;
 }
 
+export type StaffPermission = 'VAULT_VIEW' | 'VAULT_EDIT' | 'FEEDBACK_MANAGE';
+
+export interface StaffAccount {
+  id: string;
+  username: string;
+  password: string;
+  role: string;
+  permissions: StaffPermission[];
+}
+
 export interface User {
   username: string;
   email: string;
   avatar?: string;
   isAdmin: boolean;
-  provider: 'discord' | 'google' | 'email';
+  isMaster?: boolean;
+  provider: 'staff';
+  permissions: StaffPermission[];
 }
 
 export type ThemeType = 'light' | 'dark' | 'magenta' | 'lime' | 'red' | 'black';
