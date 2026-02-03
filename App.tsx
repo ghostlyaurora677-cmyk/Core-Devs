@@ -1,5 +1,5 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Navbar from './components/Navbar';
 import BotCard from './components/BotCard';
 import BotDetailView from './components/BotDetailView';
@@ -11,94 +11,19 @@ import Footer from './components/Footer';
 import LoadingScreen from './components/LoadingScreen';
 import FeedbackModal from './components/FeedbackModal';
 import { BOTS, INITIAL_RESOURCES, SUPPORT_SERVER_URL } from './constants';
-import { Resource, ResourceType, BotInfo, ThemeType, Feedback } from './types';
+import { Resource, ResourceType, BotInfo, ThemeType, Feedback, User } from './types';
 import { databaseService } from './services/databaseService';
-
-const ADMIN_PASSWORD = 'coredevs@2025';
 
 const FloatingIcons = () => (
   <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
-    {/* Discord Logo - Top Left Peripheral */}
     <div className="absolute top-[8%] left-[3%] drifting opacity-[0.05] blur-[6px] scale-110" style={{ animationDuration: '18s' }}>
       <svg className="w-28 h-28 text-[var(--brand-color)]" fill="currentColor" viewBox="0 0 24 24">
         <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037 19.736 19.736 0 0 0-4.885 1.515.069.069 0 0 0-.032.027C.533 9.048-.32 13.572.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/>
       </svg>
     </div>
-
-    {/* Sparkles (Nitro) - Top Right Peripheral */}
     <div className="absolute top-[6%] right-[5%] drifting opacity-[0.07] blur-[2px]" style={{ animationDuration: '22s', animationDelay: '-2s' }}>
       <svg className="w-24 h-24 text-[var(--brand-color)]" fill="currentColor" viewBox="0 0 24 24">
         <path d="M19 6.5L17.5 5L19 3.5L20.5 5L19 6.5ZM19 21L17.5 19.5L19 18L20.5 19.5L19 21ZM6.5 19L5 17.5L6.5 16L8 17.5L6.5 19ZM12 18L9 12L3 9L9 6L12 0L15 6L21 9L15 12L12 18Z"/>
-      </svg>
-    </div>
-
-    {/* Server Boost Crystal - Mid Left (Far) */}
-    <div className="absolute top-[35%] left-[1.5%] pulse-glow opacity-[0.06] scale-90" style={{ animationDuration: '9s' }}>
-      <svg className="w-16 h-16 text-[var(--brand-color)]" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z"/>
-      </svg>
-    </div>
-
-    {/* Nitro Gem - Mid Right (Far) */}
-    <div className="absolute top-[40%] right-[2%] drifting opacity-[0.05] blur-[1px] scale-75" style={{ animationDuration: '15s', animationDelay: '-5s' }}>
-      <svg className="w-16 h-16 text-[var(--brand-color)]" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M12 2.2L3.5 11l8.5 10.8L20.5 11 12 2.2zm0 2.5l6.3 6.3H5.7l6.3-6.3z"/>
-      </svg>
-    </div>
-
-    {/* Musical Note (Fynex Context) - Mid Left (Inner) */}
-    <div className="absolute top-[60%] left-[6%] drifting opacity-[0.04] blur-[3px]" style={{ animationDuration: '25s', animationDelay: '-8s' }}>
-      <svg className="w-20 h-20 text-[var(--brand-color)]" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h4V3h-6z"/>
-      </svg>
-    </div>
-
-    {/* Shield (Ryzer Context) - Mid Right (Inner) */}
-    <div className="absolute top-[55%] right-[7%] drifting opacity-[0.05] blur-[4px] scale-110" style={{ animationDuration: '14s', animationDelay: '-1s' }}>
-      <svg className="w-24 h-24 text-[var(--brand-color)]" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/>
-      </svg>
-    </div>
-
-    {/* Heart Reaction - Bottom Left (Edge) */}
-    <div className="absolute bottom-[25%] left-[2%] pulse-glow opacity-[0.04] scale-75" style={{ animationDuration: '12s', animationDelay: '-4s' }}>
-      <svg className="w-14 h-14 text-[var(--brand-color)]" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-      </svg>
-    </div>
-
-    {/* Smile Reaction - Bottom Right (Edge) */}
-    <div className="absolute bottom-[22%] right-[3%] drifting opacity-[0.03] blur-[1px]" style={{ animationDuration: '20s', animationDelay: '-12s' }}>
-      <svg className="w-16 h-16 text-[var(--brand-color)]" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5s.67 1.5 1.5 1.5zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/>
-      </svg>
-    </div>
-
-    {/* Controller - Lower Left Area */}
-    <div className="absolute bottom-[10%] left-[10%] drifting opacity-[0.05] blur-[2px] scale-90" style={{ animationDuration: '28s', animationDelay: '-3s' }}>
-      <svg className="w-32 h-32 text-[var(--brand-color)]" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M21 6H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2zm-10 7H8v3H6v-3H3v-2h3V8h2v3h3v2zm4.5 2c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm4 0c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
-      </svg>
-    </div>
-
-    {/* Headphones - Lower Right Area */}
-    <div className="absolute bottom-[8%] right-[12%] drifting opacity-[0.06] pulse-glow scale-110" style={{ animationDuration: '18s', animationDelay: '-6s' }}>
-      <svg className="w-28 h-28 text-[var(--brand-color)]" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M12 2a9 9 0 00-9 9v7c0 1.1.9 2 2 2h2v-7H5v-2a7 7 0 0114 0v2h-2v7h2c1.1 0 2-.9 2-2v-7a9 9 0 00-9-9z"/>
-      </svg>
-    </div>
-
-    {/* Message Bubble - Top Area (Center-Left) */}
-    <div className="absolute top-[12%] left-[35%] drifting opacity-[0.03] blur-[5px]" style={{ animationDuration: '21s', animationDelay: '-9s' }}>
-      <svg className="w-20 h-20 text-[var(--brand-color)]" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM9 11H7V9h2v2zm4 0h-2V9h2v2zm4 0h-2V9h2v2z"/>
-      </svg>
-    </div>
-
-    {/* Code Brackets - Top Area (Center-Right) */}
-    <div className="absolute top-[15%] right-[32%] drifting opacity-[0.02] blur-[8px]" style={{ animationDuration: '30s', animationDelay: '-11s' }}>
-      <svg className="w-24 h-24 text-[var(--brand-color)]" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M9.4 16.6L4.8 12l4.6-4.6L8 6l-6 6 6 6 1.4-1.4zm5.2 0l4.6-4.6-4.6-4.6L16 6l6 6-6 6-1.4-1.4z"/>
       </svg>
     </div>
   </div>
@@ -112,9 +37,10 @@ const App: React.FC = () => {
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([]);
   const [theme, setTheme] = useState<ThemeType>('dark');
   const [isAdmin, setIsAdmin] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [user, setUser] = useState<User | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     async function init() {
@@ -122,8 +48,12 @@ const App: React.FC = () => {
       const feedData = await databaseService.getFeedbacks();
       setResources(resData || []);
       setFeedbacks(feedData || []);
-      if (sessionStorage.getItem('cd_admin_session') === 'active') {
-        setIsAdmin(true);
+      
+      const sessionUser = sessionStorage.getItem('cd_user_session');
+      if (sessionUser) {
+        const parsedUser = JSON.parse(sessionUser) as User;
+        setUser(parsedUser);
+        setIsAdmin(parsedUser.isAdmin);
       }
       setIsLoaded(true);
     }
@@ -179,36 +109,45 @@ const App: React.FC = () => {
     await databaseService.clearAllFeedback();
   };
 
-  const handleLogin = (password: string): boolean => {
-    if (password === ADMIN_PASSWORD) {
-      setIsAdmin(true);
-      sessionStorage.setItem('cd_admin_session', 'active');
-      setView('admin');
-      return true;
-    }
-    return false;
+  const handleLoginSuccess = (loggedInUser: User) => {
+    setUser(loggedInUser);
+    setIsAdmin(loggedInUser.isAdmin);
+    sessionStorage.setItem('cd_user_session', JSON.stringify(loggedInUser));
+    setView('home');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleLogout = () => {
     setIsAdmin(false);
-    sessionStorage.removeItem('cd_admin_session');
-    setView('login');
+    setUser(null);
+    sessionStorage.removeItem('cd_user_session');
+    setView('home');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleNavigate = (v: any) => {
-    if (v === 'admin') {
-      isAdmin ? setView('admin') : setView('login');
+    if (v === 'admin' && !isAdmin) {
+      setView('login');
     } else {
       setView(v);
     }
-    setSearchQuery(''); 
     window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const scrollProjects = (direction: 'next' | 'back') => {
+    if (scrollContainerRef.current) {
+      const scrollAmount = window.innerWidth * 0.7;
+      scrollContainerRef.current.scrollBy({
+        left: direction === 'next' ? scrollAmount : -scrollAmount,
+        behavior: 'smooth'
+      });
+    }
   };
 
   if (!isLoaded) return <LoadingScreen />;
 
-  if (view === 'login') return <LoginView onLogin={handleLogin} onBack={() => setView('home')} />;
+  if (view === 'login') return <LoginView onLoginSuccess={handleLoginSuccess} onBack={() => setView('home')} />;
+  
   if (view === 'admin' && isAdmin) return (
     <AdminPanelView 
       resources={resources} 
@@ -218,9 +157,10 @@ const App: React.FC = () => {
       onDelete={handleDeleteResource} 
       onDeleteFeedback={handleDeleteFeedback}
       onClearAllFeedback={handleClearAllFeedback}
-      onBack={handleLogout} 
+      onBack={() => setView('home')} 
     />
   );
+
   if (view === 'bot-detail' && selectedBot) return <BotDetailView bot={selectedBot} theme={theme} onBack={() => setView('home')} />;
   if (view === 'team') return <TeamView theme={theme} onBack={() => setView('home')} />;
 
@@ -233,6 +173,8 @@ const App: React.FC = () => {
         theme={theme} 
         setTheme={setTheme} 
         isAdmin={isAdmin}
+        user={user}
+        onLogout={handleLogout}
         onOpenFeedback={() => setIsFeedbackOpen(true)}
       />
 
@@ -248,13 +190,55 @@ const App: React.FC = () => {
               </div>
             </section>
             
-            <section id="projects" className="px-6 py-24 max-w-7xl mx-auto">
-              <div className="grid grid-cols-1 gap-12">
-                {BOTS.map((bot, index) => (
-                  <div key={bot.id} className={`reveal ${index % 2 === 0 ? 'reveal-left' : 'reveal-right'}`}>
-                    <BotCard bot={bot} theme={theme} onViewDetails={(b) => { setSelectedBot(b); setView('bot-detail'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
-                  </div>
-                ))}
+            <section id="projects" className="relative py-24 max-w-[100vw]">
+              <div className="max-w-7xl mx-auto px-6 mb-12">
+                <div className="reveal active reveal-left">
+                  <h2 className={`text-4xl md:text-6xl font-black uppercase tracking-tighter ${theme !== 'light' ? 'text-white' : 'text-slate-900'}`}>Our <span className="text-[var(--brand-color)]">Projects</span></h2>
+                  <p className="text-slate-500 font-bold text-[10px] uppercase tracking-widest mt-3">Innovative Discord Solutions</p>
+                </div>
+              </div>
+
+              <div className="relative group/scroll">
+                <button 
+                  onClick={() => scrollProjects('back')} 
+                  className={`absolute left-4 md:left-10 top-1/2 -translate-y-1/2 z-20 w-16 h-16 rounded-full glass border border-white/10 flex items-center justify-center transition-all opacity-0 group-hover/scroll:opacity-100 active:scale-90 hover:bg-[var(--brand-color)] hover:border-[var(--brand-color)] group/btn shadow-2xl ${theme === 'light' ? 'bg-white border-slate-200' : ''}`}
+                >
+                  <svg className={`w-8 h-8 transition-colors ${theme !== 'light' ? 'text-slate-400 group-hover/btn:text-white' : 'text-slate-600'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M15 19l-7-7 7-7" /></svg>
+                </button>
+
+                <button 
+                  onClick={() => scrollProjects('next')} 
+                  className={`absolute right-4 md:right-10 top-1/2 -translate-y-1/2 z-20 w-16 h-16 rounded-full glass border border-white/10 flex items-center justify-center transition-all opacity-0 group-hover/scroll:opacity-100 active:scale-90 hover:bg-[var(--brand-color)] hover:border-[var(--brand-color)] group/btn shadow-2xl ${theme === 'light' ? 'bg-white border-slate-200' : ''}`}
+                >
+                  <svg className={`w-8 h-8 transition-colors ${theme !== 'light' ? 'text-slate-400 group-hover/btn:text-white' : 'text-slate-600'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" /></svg>
+                </button>
+
+                <div 
+                  ref={scrollContainerRef}
+                  className="flex gap-10 overflow-x-auto pb-20 px-6 md:px-[calc(50vw-600px)] no-scrollbar snap-x snap-mandatory scroll-smooth"
+                >
+                  {BOTS.map((bot) => (
+                    <div key={bot.id} className="min-w-[90vw] md:min-w-[1200px] snap-center">
+                      <BotCard bot={bot} theme={theme} onViewDetails={(b) => { setSelectedBot(b); setView('bot-detail'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </section>
+
+            <section id="support" className="px-6 py-32 max-w-7xl mx-auto relative overflow-hidden reveal active reveal-up">
+              <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-[var(--brand-color)]/5 blur-[150px] rounded-full -z-10 animate-pulse"></div>
+              <div className={`glass p-12 md:p-24 rounded-[4rem] text-center border relative overflow-hidden group transition-all duration-700 hover:shadow-[0_0_80px_var(--brand-glow)] ${theme !== 'light' ? 'border-white/10' : 'bg-white border-slate-200 shadow-2xl'}`}>
+                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[var(--brand-color)] to-transparent opacity-60"></div>
+                <h2 className={`text-5xl md:text-8xl font-black mb-8 tracking-tighter uppercase ${theme !== 'light' ? 'text-white' : 'text-slate-900'}`}>Need <span className="text-[var(--brand-color)]">Support?</span></h2>
+                <p className="text-slate-500 max-w-3xl mx-auto text-lg md:text-2xl font-medium mb-16 leading-relaxed">Our elite engineering team is on standby 24/7 to ensure your community's systems remain unbreakable.</p>
+                <div className="flex flex-wrap justify-center gap-8">
+                  <a href={SUPPORT_SERVER_URL} target="_blank" rel="noreferrer" className="group px-14 py-7 rounded-3xl bg-[var(--brand-color)] text-white font-black text-sm tracking-widest uppercase hover:scale-105 transition-all shadow-2xl active:scale-95 flex items-center gap-4">
+                    Join Support HQ
+                    <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+                  </a>
+                  <button onClick={() => setIsFeedbackOpen(true)} className={`px-14 py-7 rounded-3xl border font-black text-sm tracking-widest uppercase transition-all active:scale-95 ${theme !== 'light' ? 'border-white/10 hover:bg-white hover:text-black' : 'border-slate-200 hover:bg-slate-900 hover:text-white shadow-xl'}`}>Open Feedback Hub</button>
+                </div>
               </div>
             </section>
           </>
@@ -263,7 +247,7 @@ const App: React.FC = () => {
         {view === 'resources' && (
           <div className="max-w-7xl mx-auto px-6 py-20">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-                {(['API_KEY', 'CODE_SNIPPET', 'TOOL'] as ResourceType[]).map((type, idx) => (
+                {(['API_KEY', 'CODE_SNIPPET', 'TOOL'] as ResourceType[]).map((type) => (
                   <div key={type} onClick={() => { setSelectedCategory(type); setView('category-detail'); window.scrollTo({top: 0}); }} className="reveal active reveal-scale p-16 rounded-3xl text-center cursor-pointer transition-all hover:-translate-y-4 glass group">
                     <h3 className="text-3xl font-black uppercase tracking-widest group-hover:text-[var(--brand-color)] transition-colors">{type.replace('_', ' ')}</h3>
                   </div>
@@ -275,8 +259,14 @@ const App: React.FC = () => {
         {view === 'category-detail' && (
           <div className="max-w-7xl mx-auto px-6 py-20">
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {resources.filter(r => r.type === selectedCategory).map((res, idx) => (
-                  <ResourceCard key={res.id} resource={res} theme={theme} />
+                {resources.filter(r => r.type === selectedCategory).map((res) => (
+                  <ResourceCard 
+                    key={res.id} 
+                    resource={res} 
+                    theme={theme} 
+                    user={user} 
+                    onLoginRequest={() => setView('login')} 
+                  />
                 ))}
             </div>
           </div>
@@ -284,7 +274,13 @@ const App: React.FC = () => {
       </main>
 
       <Footer onNavigate={handleNavigate} theme={theme} onOpenFeedback={() => setIsFeedbackOpen(true)} />
-      <FeedbackModal isOpen={isFeedbackOpen} onClose={() => setIsFeedbackOpen(false)} theme={theme} onSubmit={handleAddFeedback} />
+      <FeedbackModal 
+        isOpen={isFeedbackOpen} 
+        onClose={() => setIsFeedbackOpen(false)} 
+        theme={theme} 
+        onSubmit={handleAddFeedback}
+        feedbacks={feedbacks}
+      />
     </div>
   );
 };

@@ -46,8 +46,10 @@ export interface Feedback {
 
 export interface User {
   username: string;
-  avatar: string;
+  email: string;
+  avatar?: string;
   isAdmin: boolean;
+  provider: 'discord' | 'google' | 'email';
 }
 
 export type ThemeType = 'light' | 'dark' | 'magenta' | 'lime' | 'red' | 'black';
