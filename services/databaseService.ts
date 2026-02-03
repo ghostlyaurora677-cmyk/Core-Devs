@@ -77,6 +77,11 @@ export const databaseService = {
     localStorage.setItem(STAFF_KEY, JSON.stringify([...current, account]));
   },
 
+  async updateStaffAccount(account: StaffAccount): Promise<void> {
+    const current = await this.getStaffAccounts();
+    localStorage.setItem(STAFF_KEY, JSON.stringify(current.map(s => s.id === account.id ? account : s)));
+  },
+
   async deleteStaffAccount(id: string): Promise<void> {
     const current = await this.getStaffAccounts();
     localStorage.setItem(STAFF_KEY, JSON.stringify(current.filter(s => s.id !== id)));

@@ -16,66 +16,58 @@ import { databaseService } from './services/databaseService';
 
 const FloatingIcons = () => (
   <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden select-none">
-    {/* Discord Logo - Top Left */}
-    <div className="absolute top-[12%] left-[8%] drifting opacity-[0.05] blur-[3px] scale-125" style={{ animationDuration: '22s' }}>
-      <svg className="w-24 h-24 text-[var(--brand-color)]" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037 19.736 19.736 0 0 0-4.885 1.515.069.069 0 0 0-.032.027C.533 9.048-.32 13.572.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/>
-      </svg>
-    </div>
-
-    {/* Nitro Gem - Top Right */}
-    <div className="absolute top-[15%] right-[10%] drifting opacity-[0.06] blur-[2px]" style={{ animationDuration: '18s', animationDelay: '-5s' }}>
-      <svg className="w-16 h-16 text-fuchsia-500" fill="currentColor" viewBox="0 0 24 24">
+    {/* --- DISCORD ELEMENTS --- */}
+    <div className="absolute top-[8%] left-[5%] pulse-soft scale-125 blur-[1px]">
+      <svg className="w-16 h-16 text-fuchsia-500/20" fill="currentColor" viewBox="0 0 24 24">
         <path d="M12 2L4.5 11L12 22L19.5 11L12 2Z M12 6.5L16 11H8L12 6.5Z"/>
       </svg>
     </div>
-
-    {/* Server Boost Diamond - Mid Right */}
-    <div className="absolute top-[40%] right-[15%] drifting opacity-[0.04] blur-[4px]" style={{ animationDuration: '25s', animationDelay: '-2s' }}>
-      <svg className="w-20 h-20 text-pink-400" fill="currentColor" viewBox="0 0 24 24">
+    <div className="absolute top-[15%] right-[5%] float-alt scale-110 blur-[2px]">
+      <svg className="w-14 h-14 text-pink-400/15" fill="currentColor" viewBox="0 0 24 24">
         <path d="M12 2L16.5 6.5L12 11L7.5 6.5L12 2ZM12 13L16.5 17.5L12 22L7.5 17.5L12 13Z"/>
       </svg>
     </div>
 
-    {/* Hype Squad Icon - Mid Left */}
-    <div className="absolute top-[35%] left-[15%] drifting opacity-[0.03] blur-[5px]" style={{ animationDuration: '28s', animationDelay: '-12s' }}>
+    {/* --- DEV LANGUAGES --- */}
+    <div className="absolute top-[30%] left-[10%] spin-slow opacity-[0.04] blur-[3px]">
+      <svg className="w-14 h-14 text-blue-400" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M11.97 0c-2.38 0-2.22 1.02-2.22 1.02l.02 1.05h4.48v.63H8.05l-1.63.02C4.12 2.72 4 4.53 4 4.53L4 7.2h2.23V4.86c0-1.1 1.05-1.2 1.24-1.2h4.5c1.24 0 1.25 1.23 1.25 1.23v2.85h-3.32v.63h4.58s2.3-.08 2.3-2.22c0-2.13-1.83-2.13-1.83-2.13l-.97.02c-1.02 0-2 .01-2.01-4.01zm-5.4 3.7c-.55 0-1 .45-1 1s.45 1 1 1 1-.45 1-1-.45-1-1-1zM11.97 24c2.38 0 2.22-1.02 2.22-1.02l-.02-1.05h-4.48v-.63h6.21l1.63-.02c2.3-.02 2.42-1.83 2.42-1.83L20 16.8h-2.23v2.34c0 1.1-1.05 1.2-1.24 1.2h-4.5c-1.24 0-1.25-1.23-1.25-1.23V16.3h3.32v-.63H9.52s-2.3.08-2.3 2.22c0 2.13 1.83 2.13 1.83 2.13l.97-.02c1.02 0 2-.01 2.01 4.01zm5.4-3.7c.55 0 1-.45 1-1s-.45-1-1-1-1 .45-1 1 .45-1 1-1z"/>
+      </svg>
+    </div>
+    <div className="absolute top-[28%] right-[15%] drifting opacity-[0.05] blur-[2px]">
+      <svg className="w-12 h-12 text-yellow-400" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M3 3h18v18H3V3zm11.525 12.835c.195.344.405.659.705.899.284.225.75.405 1.2.405.48 0 .825-.195 1.05-.405.21-.24.315-.51.315-.884 0-.585-.435-.855-.915-1.065l-.465-.21c-1.14-.495-1.89-.99-1.89-2.295 0-1.02.765-1.92 2.1-1.92 1.02 0 1.74.45 2.19 1.14l-1.35.855c-.21-.39-.495-.615-.84-.615-.33 0-.57.195-.57.51 0 .345.21.51.72.735l.435.195c1.455.63 2.16 1.185 2.16 2.52 0 1.395-1.035 2.31-2.58 2.31-1.425 0-2.31-.705-2.82-1.74l1.38-.855zM6.165 14.655c.21.36.465.659.81.854.345.225.75.3 1.155.3.69 0 1.14-.255 1.455-.675.24-.315.345-.66.345-1.395V8.85h1.725V13.74c0 1.62-.9 2.58-2.43 2.58-1.185 0-1.995-.495-2.55-1.32l1.485-.915z"/>
+      </svg>
+    </div>
+    <div className="absolute top-[45%] left-[3%] swing opacity-[0.04] blur-[3px]">
+      <svg className="w-10 h-10 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M12 2L4.5 11L12 22L19.5 11L12 2Z"/>
+      </svg>
+    </div>
+    <div className="absolute top-[48%] right-[3%] float-slow opacity-[0.03] blur-[4px]">
       <svg className="w-14 h-14 text-indigo-400" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M12 2L2 12l10 10 10-10L12 2zm0 4l6 6-6 6-6-6 6-6z"/>
-      </svg>
-    </div>
-
-    {/* Thinking Emoji - Bottom Center Left */}
-    <div className="absolute bottom-[20%] left-[25%] drifting opacity-[0.02] blur-[6px]" style={{ animationDuration: '30s', animationDelay: '-8s' }}>
-      <svg className="w-12 h-12 text-yellow-500" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-1-9.5a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0zm-5 0a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0zm6 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/>
-      </svg>
-    </div>
-
-    {/* Sparkle - Scattered Top Right */}
-    <div className="absolute top-[25%] right-[25%] drifting opacity-[0.05] blur-[1px]" style={{ animationDuration: '12s', animationDelay: '-1s' }}>
-      <svg className="w-8 h-8 text-yellow-300" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M12 1L14 8L21 10L14 12L12 19L10 12L3 10L10 8L12 1Z"/>
-      </svg>
-    </div>
-
-    {/* Heart Emoji - Bottom Right */}
-    <div className="absolute bottom-[15%] right-[8%] drifting opacity-[0.03] blur-[4px]" style={{ animationDuration: '20s', animationDelay: '-15s' }}>
-      <svg className="w-16 h-16 text-red-400" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-      </svg>
-    </div>
-
-    {/* Wave Emoji - Bottom Left */}
-    <div className="absolute bottom-[12%] left-[10%] drifting opacity-[0.04] blur-[3px]" style={{ animationDuration: '24s', animationDelay: '-4s' }}>
-      <svg className="w-12 h-12 text-amber-300" fill="currentColor" viewBox="0 0 24 24">
-        <path d="M22 12c0 5.523-4.477 10-10 10S2 17.523 2 12 6.477 2 12 2s10 4.477 10 10zm-15-1.5a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0zm10 0a1.5 1.5 0 1 1 3 0 1.5 1.5 0 0 1-3 0zm-5 8.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/>
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2z"/>
       </svg>
     </div>
   </div>
 );
 
+type AppView = 'home' | 'resources' | 'admin' | 'bot-detail' | 'login' | 'category-detail' | 'team';
+
+const VIEW_ORDER: Record<string, number> = {
+  'home': 0,
+  'resources': 1,
+  'category-detail': 1.5,
+  'team': 2,
+  'bot-detail': 3,
+  'admin': 10,
+  'login': 11
+};
+
 const App: React.FC = () => {
-  const [view, setView] = useState<'home' | 'resources' | 'admin' | 'bot-detail' | 'login' | 'category-detail' | 'team'>('home');
+  const [view, setView] = useState<AppView>('home');
+  const [isNavigating, setIsNavigating] = useState(false);
+  const [navDirection, setNavDirection] = useState<'up' | 'down'>('down');
   const [selectedCategory, setSelectedCategory] = useState<ResourceType | null>(null);
   const [selectedBot, setSelectedBot] = useState<BotInfo | null>(null);
   const [resources, setResources] = useState<Resource[]>([]);
@@ -107,16 +99,27 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const root = document.documentElement;
-    let brandColor = '#5865F2';
+    let brandColor = '#5865F2'; // Discord Blurple
     let brandGlow = 'rgba(88, 101, 242, 0.4)';
     let bgColor = '#0b0e14';
 
     switch (theme) {
-      case 'light': brandColor = '#4f46e5'; brandGlow = 'rgba(79, 70, 229, 0.2)'; bgColor = '#f8fafc'; break;
-      case 'magenta': brandColor = '#ff00ff'; brandGlow = 'rgba(255, 0, 255, 0.4)'; break;
-      case 'lime': brandColor = '#a3e635'; brandGlow = 'rgba(163, 230, 53, 0.4)'; break;
-      case 'red': brandColor = '#f43f5e'; brandGlow = 'rgba(244, 63, 94, 0.4)'; break;
-      case 'black': brandColor = '#ffffff'; brandGlow = 'rgba(255, 255, 255, 0.4)'; bgColor = '#000000'; break;
+      case 'light': // White Theme
+        brandColor = '#5865F2'; 
+        brandGlow = 'rgba(88, 101, 242, 0.2)'; 
+        bgColor = '#ffffff'; 
+        break;
+      case 'black': // OLED Theme
+        brandColor = '#ffffff'; 
+        brandGlow = 'rgba(255, 255, 255, 0.3)'; 
+        bgColor = '#000000'; 
+        break;
+      case 'dark': // Blue Theme (Default)
+      default:
+        brandColor = '#5865F2'; 
+        brandGlow = 'rgba(88, 101, 242, 0.4)'; 
+        bgColor = '#0b0e14'; 
+        break;
     }
 
     root.style.setProperty('--brand-color', brandColor);
@@ -158,65 +161,63 @@ const App: React.FC = () => {
     setUser(loggedInUser);
     setIsAdmin(loggedInUser.isAdmin);
     sessionStorage.setItem('cd_user_session', JSON.stringify(loggedInUser));
-    if (loggedInUser.isAdmin) {
-      setView('admin');
-    } else {
-      setView('home');
-    }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    handleNavigate('admin', undefined, true);
   };
 
   const handleLogout = () => {
     setIsAdmin(false);
     setUser(null);
     sessionStorage.removeItem('cd_user_session');
-    setView('home');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    handleNavigate('home');
   };
 
-  const handleNavigate = (v: any) => {
-    if (v === 'admin' && !isAdmin) {
-      setView('login');
-    } else {
-      setView(v);
+  const handleNavigate = (targetView: AppView, scrollTarget?: string, forceAdmin: boolean = false) => {
+    if (targetView === 'admin' && !isAdmin && !forceAdmin) {
+      handleNavigate('login');
+      return;
     }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
 
-  const scrollProjects = (direction: 'next' | 'back') => {
-    if (scrollContainerRef.current) {
-      const scrollAmount = window.innerWidth * 0.7;
-      scrollContainerRef.current.scrollBy({
-        left: direction === 'next' ? scrollAmount : -scrollAmount,
-        behavior: 'smooth'
-      });
-    }
+    const currentIndex = VIEW_ORDER[view] || 0;
+    const targetIndex = VIEW_ORDER[targetView] || 0;
+    setNavDirection(targetIndex >= currentIndex ? 'down' : 'up');
+
+    setIsNavigating(true);
+    
+    setTimeout(() => {
+      setView(targetView);
+      if (!scrollTarget) {
+        window.scrollTo({ top: 0, behavior: 'auto' });
+      }
+      
+      setTimeout(() => {
+        setIsNavigating(false);
+        if (scrollTarget) {
+          setTimeout(() => {
+            const el = document.getElementById(scrollTarget);
+            el?.scrollIntoView({ behavior: 'smooth' });
+          }, 100);
+        }
+      }, 50);
+    }, 550); 
   };
 
   if (!isLoaded) return <LoadingScreen />;
 
-  if (view === 'login') return <LoginView onLoginSuccess={handleLoginSuccess} onBack={() => setView('home')} />;
+  if (view === 'login') return <LoginView onLoginSuccess={handleLoginSuccess} onBack={() => handleNavigate('home')} />;
   
-  if (view === 'admin' && isAdmin) return (
-    <AdminPanelView 
-      user={user}
-      resources={resources} 
-      feedbacks={feedbacks}
-      onAdd={handleAddResource} 
-      onUpdate={handleUpdateResource} 
-      onDelete={handleDeleteResource} 
-      onDeleteFeedback={handleDeleteFeedback}
-      onClearAllFeedback={handleClearAllFeedback}
-      onBack={() => setView('home')} 
-    />
-  );
-
-  if (view === 'bot-detail' && selectedBot) return <BotDetailView bot={selectedBot} theme={theme} onBack={() => setView('home')} />;
-  if (view === 'team') return <TeamView theme={theme} onBack={() => setView('home')} />;
+  const transitionTransform = isNavigating 
+    ? (navDirection === 'down' ? 'translateY(-20vh) scale(0.9) rotateX(2deg)' : 'translateY(20vh) scale(0.9) rotateX(-2deg)')
+    : 'translateY(0) scale(1) rotateX(0deg)';
 
   return (
-    <div className={`min-h-screen flex flex-col transition-colors duration-500 ${theme === 'black' ? 'bg-[#000000] text-white' : theme !== 'light' ? 'bg-[var(--bg-color)] text-white' : 'bg-slate-50 text-slate-900'} selection:bg-[var(--brand-color)] selection:text-white`}>
+    <div className={`min-h-screen flex flex-col transition-colors duration-500 ${theme === 'black' ? 'bg-[#000000] text-white' : theme !== 'light' ? 'bg-[var(--bg-color)] text-white' : 'bg-white text-slate-900'} selection:bg-[var(--brand-color)] selection:text-white perspective-1000`}>
       <FloatingIcons />
+      
+      <div className={`fixed inset-0 pointer-events-none z-0 overflow-hidden transition-all duration-1000 ease-out ${isNavigating ? 'scale-110 opacity-30 blur-md' : 'scale-100 opacity-100 blur-0'}`}>
+        <div className="absolute top-[20%] left-[30%] w-[500px] h-[500px] rounded-full bg-indigo-500/5 blur-[120px] animate-nebula"></div>
+        <div className="absolute bottom-[20%] right-[30%] w-[600px] h-[600px] rounded-full bg-purple-500/5 blur-[150px] animate-nebula" style={{ animationDelay: '-10s' }}></div>
+      </div>
+
       <Navbar 
         onNavigate={handleNavigate} 
         currentView={view} 
@@ -228,32 +229,61 @@ const App: React.FC = () => {
         onOpenFeedback={() => setIsFeedbackOpen(true)}
       />
 
-      <main className="flex-grow pt-24 fade-in relative z-10">
-        {view === 'home' && (
+      <div className={`fixed inset-0 z-[65] pointer-events-none transition-all duration-700 ease-in-out ${isNavigating ? 'opacity-100 backdrop-blur-sm' : 'opacity-0 backdrop-blur-0'}`}>
+         <div className="absolute inset-0 bg-gradient-to-b from-black/0 via-[var(--brand-color)]/10 to-black/0"></div>
+      </div>
+
+      <main 
+        key={view}
+        className={`flex-grow pt-24 relative z-10 will-change-[transform,opacity,filter] transition-all duration-[600ms] ease-[cubic-bezier(0.23,1,0.32,1)] ${isNavigating ? 'opacity-0 filter blur-lg' : 'opacity-100 filter blur-0'}`}
+        style={{ transform: transitionTransform }}
+      >
+        {view === 'admin' ? (
+          <AdminPanelView 
+            user={user}
+            resources={resources} 
+            feedbacks={feedbacks}
+            onAdd={handleAddResource} 
+            onUpdate={handleUpdateResource} 
+            onDelete={handleDeleteResource} 
+            onDeleteFeedback={handleDeleteFeedback}
+            onClearAllFeedback={handleClearAllFeedback}
+            onBack={() => handleNavigate('home')} 
+          />
+        ) : view === 'home' ? (
           <>
-            <section className="px-6 py-40 md:py-60 text-center relative overflow-hidden flex flex-col items-center justify-center min-h-[95vh]">
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[900px] hero-gradient blur-[180px] -z-10 opacity-70 animate-pulse"></div>
+            <section className="px-6 py-32 lg:py-56 text-center relative overflow-hidden flex flex-col items-center justify-center min-h-[100vh]">
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-[1000px] hero-gradient blur-[180px] -z-10 opacity-60 animate-pulse"></div>
               
-              <div className="relative mb-14 reveal active reveal-down">
-                <div className="absolute -top-16 left-1/2 -translate-x-1/2 px-8 py-3 bg-[var(--brand-color)]/10 border border-[var(--brand-color)]/30 rounded-full backdrop-blur-xl shadow-2xl scale-90 md:scale-100">
-                   <span className="text-[11px] font-black uppercase tracking-[0.5em] text-[var(--brand-color)]">Next-Gen Infrastructure</span>
+              <div className="reveal active reveal-down mb-12 md:mb-16">
+                <div className="inline-flex items-center gap-4 px-10 py-3 bg-[var(--brand-color)]/10 border border-[var(--brand-color)]/30 rounded-full backdrop-blur-2xl shadow-2xl scale-90 md:scale-100 group transition-all hover:bg-[var(--brand-color)]/20 hover:border-[var(--brand-color)]/50">
+                   <div className="w-2 h-2 rounded-full bg-[var(--brand-color)] animate-ping"></div>
+                   <span className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.7em] text-[var(--brand-color)] pl-1">Next-Gen Infrastructure</span>
                 </div>
-                <h1 className="text-8xl md:text-[16rem] font-black tracking-tighter leading-[0.7] uppercase drop-shadow-2xl">
-                  CORE <span className="text-[var(--brand-color)] drop-shadow-[0_0_80px_var(--brand-glow)]">DEVS</span>
+              </div>
+
+              <div className="relative mb-12 md:mb-16 reveal active reveal-scale stagger-1">
+                <h1 className="text-[16vw] md:text-[13rem] lg:text-[16rem] font-black tracking-tighter leading-[0.8] uppercase drop-shadow-[0_35px_60px_rgba(0,0,0,0.6)]">
+                  CORE <span className="text-[var(--brand-color)] drop-shadow-[0_0_120px_var(--brand-glow)]">DEVS</span>
                 </h1>
               </div>
 
-              <p className="reveal active reveal-up stagger-1 max-w-4xl mx-auto text-2xl md:text-4xl mb-20 font-medium leading-tight tracking-tighter text-slate-400">
-                Architecting the future of <span className="text-white border-b-4 border-[var(--brand-color)]/30">Discord ecosystems</span> and providing exclusive free assets for developers.
-              </p>
+              <div className="reveal active reveal-up stagger-2 max-w-3xl lg:max-w-4xl mx-auto mb-16 md:mb-24 px-6">
+                <p className={`text-xl md:text-2xl lg:text-3xl font-medium leading-[1.3] tracking-tight text-slate-400 drop-shadow-sm`}>
+                  Architecting the future of <span className={`${theme === 'light' ? 'text-slate-900' : 'text-white'} relative inline-block group font-bold`}>
+                    Discord ecosystems
+                    <span className="absolute bottom-1 left-0 w-full h-[2px] bg-[var(--brand-color)]/60 group-hover:h-2 transition-all"></span>
+                  </span> and providing exclusive free assets for the world's most <span className={`${theme === 'light' ? 'text-slate-900' : 'text-white'} italic font-bold`}>ambitious developers</span>.
+                </p>
+              </div>
               
-              <div className="reveal active reveal-scale stagger-2 flex flex-wrap justify-center gap-10">
+              <div className="reveal active reveal-scale stagger-3 flex flex-col sm:flex-row justify-center gap-6 md:gap-8 w-full max-w-md md:max-w-none">
                 <button 
-                  onClick={() => setView('resources')} 
-                  className="group bg-[var(--brand-color)] hover:bg-white hover:text-black px-16 py-8 rounded-[2.5rem] font-black text-sm tracking-[0.2em] transition-all glow shadow-2xl active:scale-95 flex items-center gap-5 hover:shadow-[0_0_60px_var(--brand-glow)]"
+                  onClick={() => handleNavigate('resources')} 
+                  className={`group bg-[var(--brand-color)] hover:bg-white hover:text-black px-14 py-7 md:px-20 md:py-8 rounded-[2.5rem] font-black text-[11px] md:text-xs tracking-[0.25em] transition-all glow shadow-2xl active:scale-95 flex items-center justify-center gap-5 hover:shadow-[0_0_80px_var(--brand-glow)] uppercase ${theme === 'black' ? 'text-black' : 'text-white'}`}
                 >
                   ACCESS THE VAULT
-                  <svg className="w-6 h-6 transition-transform group-hover:translate-x-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-5 h-5 md:w-6 md:h-6 transition-transform group-hover:translate-x-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                   </svg>
                 </button>
@@ -262,27 +292,10 @@ const App: React.FC = () => {
                     const el = document.getElementById('projects');
                     el?.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  className={`px-16 py-8 rounded-[2.5rem] border-2 font-black text-sm tracking-[0.2em] transition-all active:scale-95 ${theme !== 'light' ? 'bg-white/5 border-white/10 text-white hover:bg-white hover:text-black hover:border-white' : 'bg-white border-slate-200 text-slate-900 shadow-xl'}`}
+                  className={`px-14 py-7 md:px-20 md:py-8 rounded-[2.5rem] border-2 font-black text-[11px] md:text-xs tracking-[0.25em] transition-all active:scale-95 uppercase ${theme !== 'light' ? 'bg-white/5 border-white/10 text-white hover:bg-white hover:text-black hover:border-white' : 'bg-white border-slate-200 text-slate-900 shadow-xl'}`}
                 >
                   VIEW PROJECTS
                 </button>
-              </div>
-
-              <div className="mt-32 flex items-center gap-12 opacity-50 grayscale reveal active reveal-up stagger-3">
-                 <div className="flex flex-col items-center">
-                    <span className="text-4xl font-black mb-1">99.9%</span>
-                    <span className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500">Service Uptime</span>
-                 </div>
-                 <div className="w-px h-12 bg-white/20"></div>
-                 <div className="flex flex-col items-center">
-                    <span className="text-4xl font-black mb-1">120k+</span>
-                    <span className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500">Global Users</span>
-                 </div>
-                 <div className="w-px h-12 bg-white/20"></div>
-                 <div className="flex flex-col items-center">
-                    <span className="text-4xl font-black mb-1">REALTIME</span>
-                    <span className="text-[9px] font-black uppercase tracking-[0.3em] text-slate-500">Node Monitoring</span>
-                 </div>
               </div>
             </section>
             
@@ -297,78 +310,63 @@ const App: React.FC = () => {
               </div>
 
               <div className="relative group/scroll">
-                <button 
-                  onClick={() => scrollProjects('back')} 
-                  className={`absolute left-4 md:left-12 top-1/2 -translate-y-1/2 z-20 w-24 h-24 rounded-[3rem] glass border border-white/10 flex items-center justify-center transition-all opacity-0 group-hover/scroll:opacity-100 active:scale-90 hover:bg-[var(--brand-color)] hover:border-[var(--brand-color)] group/btn shadow-2xl ${theme === 'light' ? 'bg-white border-slate-200 shadow-2xl' : ''}`}
-                >
-                  <svg className={`w-12 h-12 transition-colors ${theme !== 'light' ? 'text-slate-400 group-hover/btn:text-white' : 'text-slate-600'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M15 19l-7-7 7-7" /></svg>
-                </button>
-
-                <button 
-                  onClick={() => scrollProjects('next')} 
-                  className={`absolute right-4 md:right-12 top-1/2 -translate-y-1/2 z-20 w-24 h-24 rounded-[3rem] glass border border-white/10 flex items-center justify-center transition-all opacity-0 group-hover/scroll:opacity-100 active:scale-90 hover:bg-[var(--brand-color)] hover:border-[var(--brand-color)] group/btn shadow-2xl ${theme === 'light' ? 'bg-white border-slate-200 shadow-2xl' : ''}`}
-                >
-                  <svg className={`w-12 h-12 transition-colors ${theme !== 'light' ? 'text-slate-400 group-hover/btn:text-white' : 'text-slate-600'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" /></svg>
-                </button>
-
                 <div 
                   ref={scrollContainerRef}
                   className="flex gap-16 overflow-x-auto pb-32 px-6 md:px-[calc(50vw-650px)] no-scrollbar snap-x snap-mandatory scroll-smooth"
                 >
                   {BOTS.map((bot) => (
                     <div key={bot.id} className="min-w-[95vw] md:min-w-[1300px] snap-center">
-                      <BotCard bot={bot} theme={theme} onViewDetails={(b) => { setSelectedBot(b); setView('bot-detail'); window.scrollTo({ top: 0, behavior: 'smooth' }); }} />
+                      <BotCard bot={bot} theme={theme} onViewDetails={(b) => { setSelectedBot(b); handleNavigate('bot-detail'); }} />
                     </div>
                   ))}
                 </div>
               </div>
             </section>
-
-            <section id="support" className="px-6 py-40 max-w-7xl mx-auto relative overflow-hidden reveal active reveal-up">
-              <div className="absolute top-0 right-0 w-[700px] h-[700px] bg-[var(--brand-color)]/10 blur-[200px] rounded-full -z-10 animate-pulse"></div>
-              <div className={`glass p-20 md:p-40 rounded-[6rem] text-center border relative overflow-hidden group transition-all duration-1000 hover:shadow-[0_0_120px_var(--brand-glow)] ${theme !== 'light' ? 'border-white/10' : 'bg-white border-slate-200 shadow-2xl'}`}>
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-[var(--brand-color)] to-transparent opacity-80"></div>
-                <h2 className={`text-7xl md:text-[12rem] font-black mb-12 tracking-tighter uppercase leading-[0.8] ${theme !== 'light' ? 'text-white' : 'text-slate-900'}`}>Need <span className="text-[var(--brand-color)]">Support?</span></h2>
-                <p className="text-slate-500 max-w-5xl mx-auto text-2xl md:text-4xl font-medium mb-24 leading-tight tracking-tight">Our elite engineering core is on standby 24/7 to ensure your systems remain unbreakable.</p>
-                <div className="flex flex-wrap justify-center gap-12">
-                  <a href={SUPPORT_SERVER_URL} target="_blank" rel="noreferrer" className="group px-20 py-10 rounded-[3rem] bg-[var(--brand-color)] text-white font-black text-sm tracking-[0.4em] uppercase hover:scale-105 transition-all shadow-[0_30px_70px_var(--brand-glow)] active:scale-95 flex items-center gap-6">
-                    JOIN SUPPORT HQ
-                    <svg className="w-7 h-7 group-hover:translate-x-2 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
-                  </a>
-                  <button onClick={() => setIsFeedbackOpen(true)} className={`px-20 py-10 rounded-[3rem] border-2 font-black text-sm tracking-[0.4em] uppercase transition-all active:scale-95 ${theme !== 'light' ? 'border-white/10 hover:bg-white hover:text-black hover:border-white' : 'border-slate-200 hover:bg-slate-900 hover:text-white shadow-xl'}`}>OPEN FEEDBACK HUB</button>
-                </div>
-              </div>
-            </section>
           </>
-        )}
-
-        {view === 'resources' && (
-          <div className="max-w-7xl mx-auto px-6 py-20">
+        ) : view === 'resources' ? (
+          <div className="max-w-7xl mx-auto px-6 py-20 min-h-[70vh]">
+            <div className="text-center mb-24 reveal active reveal-down">
+               <h1 className={`text-6xl md:text-9xl font-black uppercase tracking-tighter mb-6 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>The <span className="text-[var(--brand-color)]">Vault</span></h1>
+               <p className="text-slate-500 font-black uppercase tracking-[0.4em] text-xs">Exposing the architecture of Core Devs</p>
+            </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-                {(['API_KEY', 'CODE_SNIPPET', 'TOOL'] as ResourceType[]).map((type) => (
-                  <div key={type} onClick={() => { setSelectedCategory(type); setView('category-detail'); window.scrollTo({top: 0}); }} className="reveal active reveal-scale p-16 rounded-3xl text-center cursor-pointer transition-all hover:-translate-y-4 glass group">
-                    <h3 className="text-3xl font-black uppercase tracking-widest group-hover:text-[var(--brand-color)] transition-colors">{type.replace('_', ' ')}</h3>
+                {(['API_KEY', 'CODE_SNIPPET', 'TOOL'] as ResourceType[]).map((type, idx) => (
+                  <div 
+                    key={type} 
+                    onClick={() => { setSelectedCategory(type); handleNavigate('category-detail'); }} 
+                    className={`reveal active reveal-scale stagger-${idx+1} p-20 rounded-[3rem] text-center cursor-pointer transition-all hover:-translate-y-4 glass group relative overflow-hidden`}
+                  >
+                    <div className="absolute top-0 left-0 w-full h-1 bg-[var(--brand-color)] opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                    <h3 className={`text-3xl font-black uppercase tracking-widest group-hover:text-[var(--brand-color)] transition-colors relative z-10 ${theme === 'light' ? 'text-slate-800' : 'text-white'}`}>{type.replace('_', ' ')}</h3>
+                    <div className="mt-8 text-[9px] font-black text-slate-500 uppercase tracking-widest group-hover:text-slate-300 transition-colors">Access Archive</div>
                   </div>
                 ))}
             </div>
           </div>
-        )}
-
-        {view === 'category-detail' && (
+        ) : view === 'category-detail' ? (
           <div className="max-w-7xl mx-auto px-6 py-20">
+            <button onClick={() => handleNavigate('resources')} className={`mb-12 font-bold hover:text-[var(--brand-color)] transition-colors flex items-center gap-3 text-[10px] uppercase tracking-widest group ${theme === 'light' ? 'text-slate-600' : 'text-white'}`}>
+               <div className={`w-10 h-10 rounded-xl flex items-center justify-center group-hover:-translate-x-1 transition-transform border ${theme !== 'light' ? 'glass border-white/10' : 'bg-slate-50 border-slate-200'}`}>
+                 <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg>
+               </div>
+               Back to Categories
+            </button>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                {resources.filter(r => r.type === selectedCategory).map((res) => (
-                  <ResourceCard 
-                    key={res.id} 
-                    resource={res} 
-                    theme={theme} 
-                    user={user} 
-                    onLoginRequest={() => setView('login')} 
-                  />
+                {resources.filter(r => r.type === selectedCategory).map((res, idx) => (
+                  <div key={res.id} className={`reveal active reveal-up stagger-${(idx % 3) + 1}`}>
+                    <ResourceCard 
+                      resource={res} 
+                      theme={theme} 
+                    />
+                  </div>
                 ))}
             </div>
           </div>
-        )}
+        ) : view === 'bot-detail' && selectedBot ? (
+          <BotDetailView bot={selectedBot} theme={theme} onBack={() => handleNavigate('home')} />
+        ) : view === 'team' ? (
+          <TeamView theme={theme} onBack={() => handleNavigate('home')} />
+        ) : null}
       </main>
 
       <Footer onNavigate={handleNavigate} theme={theme} onOpenFeedback={() => setIsFeedbackOpen(true)} />

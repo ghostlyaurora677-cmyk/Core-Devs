@@ -1,9 +1,8 @@
-
 import React, { useState } from 'react';
 import { ThemeType, User } from '../types';
 
 interface NavbarProps {
-  onNavigate: (view: any) => void;
+  onNavigate: (view: any, scrollTarget?: string) => void;
   currentView: string;
   theme: ThemeType;
   setTheme: (t: ThemeType) => void;
@@ -20,11 +19,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, theme, setThem
   const scrollToSection = (id: string) => {
     setIsMobileMenuOpen(false);
     if (currentView !== 'home') {
-      onNavigate('home');
-      setTimeout(() => {
-        const el = document.getElementById(id);
-        el?.scrollIntoView({ behavior: 'smooth' });
-      }, 150);
+      onNavigate('home', id);
     } else {
       const el = document.getElementById(id);
       el?.scrollIntoView({ behavior: 'smooth' });
@@ -38,20 +33,17 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, theme, setThem
     { label: 'Support', action: () => scrollToSection('support'), active: false },
   ];
 
-  const themeOptions: { value: ThemeType; color: string }[] = [
-    { value: 'dark', color: '#5865F2' },
-    { value: 'black', color: '#000000' },
-    { value: 'light', color: '#ffffff' },
-    { value: 'magenta', color: '#ff00ff' },
-    { value: 'lime', color: '#a3e635' },
-    { value: 'red', color: '#f43f5e' },
+  const themeOptions: { value: ThemeType; color: string; label: string }[] = [
+    { value: 'dark', color: '#5865F2', label: 'Blue' },
+    { value: 'black', color: '#000000', label: 'Black' },
+    { value: 'light', color: '#ffffff', label: 'White' },
   ];
 
   const getActiveThemeColor = () => themeOptions.find(o => o.value === theme)?.color || '#5865F2';
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-[60] h-20 glass flex items-center justify-between px-6 md:px-12 border-b border-white/5">
+      <nav className={`fixed top-0 left-0 right-0 z-[60] h-20 glass flex items-center justify-between px-6 md:px-12 border-b transition-colors duration-500 ${theme === 'light' ? 'bg-white/80 border-slate-200 shadow-sm' : 'border-white/5'}`}>
         <div className="flex items-center gap-6 shrink-0">
           <div className="flex items-center gap-3 cursor-pointer group" onClick={() => onNavigate('home')}>
             <div className={`w-10 h-10 rounded-xl bg-[var(--brand-color)] flex items-center justify-center font-black text-xl shadow-[0_0_20px_var(--brand-glow)] group-hover:scale-110 transition-all duration-300 ${theme === 'black' ? 'text-black' : 'text-white'}`}>
@@ -63,7 +55,9 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, theme, setThem
               </span>
               <div className="flex items-center gap-1.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
-                <span className="text-[8px] font-bold text-slate-500 tracking-[0.2em] uppercase">Online</span>
+                <span className="text-[8px] font-bold text-slate-500 tracking-[0.2em] uppercase">
+                  {user ? `${user.role} Access` : 'Online'}
+                </span>
               </div>
             </div>
           </div>
@@ -74,7 +68,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, theme, setThem
             <button 
               key={link.label}
               onClick={link.action}
-              className={`text-[10px] font-black uppercase tracking-[0.2em] transition-all relative group h-full py-4 ${link.active ? 'text-[var(--brand-color)]' : 'text-slate-400 hover:text-white'}`}
+              className={`text-[10px] font-black uppercase tracking-[0.2em] transition-all relative group h-full py-4 ${link.active ? 'text-[var(--brand-color)]' : theme === 'light' ? 'text-slate-500 hover:text-slate-900' : 'text-slate-400 hover:text-white'}`}
             >
               {link.label}
               <span className={`absolute -bottom-1 left-0 h-0.5 bg-[var(--brand-color)] transition-all duration-300 ${link.active ? 'w-full' : 'w-0 group-hover:w-full'}`}></span>
@@ -86,7 +80,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, theme, setThem
           <button 
             onClick={onOpenFeedback}
             className={`hidden sm:flex w-10 h-10 rounded-xl items-center justify-center transition-all active:scale-90 border ${
-              theme !== 'light' ? 'bg-white/5 border-white/10 text-slate-400 hover:text-white hover:bg-white/10' : 'bg-white border-slate-200 text-slate-500 hover:bg-slate-50'
+              theme !== 'light' ? 'bg-white/5 border-white/10 text-slate-400 hover:text-white hover:bg-white/10' : 'bg-slate-50 border-slate-200 text-slate-500 hover:bg-white'
             }`}
             title="Send Feedback"
           >
@@ -98,7 +92,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, theme, setThem
           <div className="relative">
             <button 
               onClick={() => setIsThemeMenuOpen(!isThemeMenuOpen)}
-              className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 border border-white/10 flex items-center justify-center transition-all active:scale-90 shadow-xl"
+              className={`w-10 h-10 rounded-full border flex items-center justify-center transition-all active:scale-90 shadow-xl ${theme === 'light' ? 'bg-slate-50 border-slate-200' : 'bg-white/10 border-white/10 hover:bg-white/20'}`}
               aria-label="Toggle Theme"
             >
               <div 
@@ -108,15 +102,15 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, theme, setThem
             </button>
             
             {isThemeMenuOpen && (
-              <div className="absolute top-14 right-0 glass rounded-3xl p-3 border border-white/10 shadow-[0_20px_60px_rgba(0,0,0,0.5)] animate-in zoom-in-95 duration-200 origin-top-right z-[100]">
+              <div className={`absolute top-14 right-0 glass rounded-3xl p-3 border shadow-[0_20px_60px_rgba(0,0,0,0.5)] animate-in zoom-in-95 duration-200 origin-top-right z-[100] ${theme === 'light' ? 'bg-white border-slate-200' : 'border-white/10'}`}>
                 <div className="flex flex-col gap-3">
                   {themeOptions.map((opt) => (
                     <button
                       key={opt.value}
                       onClick={() => { setTheme(opt.value); setIsThemeMenuOpen(false); }}
-                      className={`w-8 h-8 rounded-full transition-all flex items-center justify-center border-2 ${theme === opt.value ? 'border-white scale-110 shadow-[0_0_15px_rgba(255,255,255,0.3)]' : 'border-white/20 hover:scale-110 hover:border-white/40'}`}
+                      className={`w-8 h-8 rounded-full transition-all flex items-center justify-center border-2 ${theme === opt.value ? 'border-[var(--brand-color)] scale-110 shadow-[0_0_15px_var(--brand-glow)]' : theme === 'light' ? 'border-slate-200' : 'border-white/20 hover:scale-110 hover:border-white/40'}`}
                       style={{ backgroundColor: opt.color }}
-                      title={opt.value}
+                      title={opt.label}
                     />
                   ))}
                 </div>
@@ -124,16 +118,25 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, theme, setThem
             )}
           </div>
 
-          <div className="h-8 w-px bg-white/10 hidden sm:block mx-1"></div>
+          <div className="h-8 w-px bg-slate-500/10 hidden sm:block mx-1"></div>
 
           {user ? (
-            <button 
-              onClick={onLogout}
-              className="px-5 py-2.5 rounded-xl bg-red-600/10 border border-red-500/20 text-red-400 font-black text-[10px] uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all flex items-center gap-2 active:scale-95"
-            >
-              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-              Logout
-            </button>
+            <div className="flex items-center gap-3">
+              {isAdmin && (
+                <button 
+                  onClick={() => onNavigate('admin')}
+                  className="px-4 py-2.5 rounded-xl bg-indigo-600/10 border border-indigo-500/20 text-indigo-400 font-black text-[10px] uppercase tracking-widest hover:bg-indigo-600 hover:text-white transition-all"
+                >
+                  Panel
+                </button>
+              )}
+              <button 
+                onClick={onLogout}
+                className="px-5 py-2.5 rounded-xl bg-red-600/10 border border-red-500/20 text-red-400 font-black text-[10px] uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all flex items-center gap-2 active:scale-95"
+              >
+                Logout
+              </button>
+            </div>
           ) : (
             <button 
               onClick={() => onNavigate('login')}
@@ -146,7 +149,7 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, theme, setThem
 
           <button 
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden p-2.5 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-slate-400"
+            className={`md:hidden p-2.5 rounded-xl border ${theme === 'light' ? 'bg-slate-50 border-slate-200 text-slate-500' : 'bg-white/5 border-white/10 text-slate-400'}`}
           >
             {isMobileMenuOpen ? (
               <svg xmlns="http://www.w3.org/2000/svg" className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
@@ -158,13 +161,13 @@ const Navbar: React.FC<NavbarProps> = ({ onNavigate, currentView, theme, setThem
       </nav>
 
       {isMobileMenuOpen && (
-        <div className="fixed inset-0 z-[55] bg-black/95 backdrop-blur-xl md:hidden pt-24 px-6 animate-in slide-in-from-top-10 duration-300">
+        <div className={`fixed inset-0 z-[55] backdrop-blur-xl md:hidden pt-24 px-6 animate-in slide-in-from-top-10 duration-300 ${theme === 'light' ? 'bg-white/95' : 'bg-black/95'}`}>
           <div className="flex flex-col gap-6">
             {navLinks.map((link) => (
               <button 
                 key={link.label}
                 onClick={link.action}
-                className="text-left py-6 border-b border-white/5 text-2xl font-black uppercase tracking-widest text-slate-400 hover:text-white active:text-[var(--brand-color)] transition-colors"
+                className={`text-left py-6 border-b border-white/5 text-2xl font-black uppercase tracking-widest transition-colors ${theme === 'light' ? 'text-slate-600 border-slate-100 hover:text-indigo-600' : 'text-slate-400 hover:text-white'}`}
               >
                 {link.label}
               </button>

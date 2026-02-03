@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BotInfo, ThemeType } from '../types';
 import { SUPPORT_SERVER_URL } from '../constants';
@@ -140,7 +139,7 @@ const BotDetailView: React.FC<BotDetailViewProps> = ({ bot, theme = 'dark', onBa
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
           <div className="lg:col-span-2 space-y-12">
-            <section className={`rounded-[3rem] p-12 border reveal reveal-up ${theme !== 'light' ? 'bg-[#161a23]/50 border-white/5 backdrop-blur-md' : 'bg-white border-slate-200 shadow-md'}`}>
+            <section className={`rounded-[3rem] p-12 border reveal reveal-up active ${theme !== 'light' ? 'bg-[#161a23]/50 border-white/5 backdrop-blur-md' : 'bg-white border-slate-200 shadow-md'}`}>
               <div className="flex items-center gap-6 mb-10">
                 <div className="w-1.5 h-10 bg-[var(--brand-color)] rounded-full"></div>
                 <h2 className={`text-4xl font-black tracking-tight ${theme !== 'light' ? 'text-white' : 'text-slate-900'}`}>System Architecture</h2>
@@ -150,18 +149,21 @@ const BotDetailView: React.FC<BotDetailViewProps> = ({ bot, theme = 'dark', onBa
               </p>
             </section>
 
-            <section className={`rounded-[3rem] p-12 border reveal reveal-up stagger-1 ${theme !== 'light' ? 'bg-[#161a23]/50 border-white/5 backdrop-blur-md' : 'bg-white border-slate-200 shadow-md'}`}>
+            <section className={`rounded-[3rem] p-12 border reveal reveal-up active ${theme !== 'light' ? 'bg-[#161a23]/50 border-white/5 backdrop-blur-md' : 'bg-white border-slate-200 shadow-md'}`}>
               <div className="flex items-center gap-6 mb-12">
                 <div className="w-1.5 h-10 bg-emerald-500 rounded-full"></div>
                 <h2 className={`text-4xl font-black tracking-tight ${theme !== 'light' ? 'text-white' : 'text-slate-900'}`}>Capabilities</h2>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
                 {bot.features.map((feature, idx) => (
-                  <div key={idx} className={`rounded-[2rem] p-8 border transition-all group/feat ${theme !== 'light' ? 'bg-white/5 border-white/5 hover:border-[var(--brand-color)]/40 hover:bg-white/[0.07]' : 'bg-slate-50 border-slate-200 hover:border-[var(--brand-color)]/20 hover:bg-white shadow-sm'}`}>
-                    <div className="w-14 h-14 text-[var(--brand-color)] mb-8 p-3 rounded-2xl bg-[var(--brand-color)]/10 group-hover/feat:scale-105 group-hover/feat:rotate-[5deg] transition-all duration-300">
+                  <div 
+                    key={idx} 
+                    className={`reveal reveal-up active stagger-${(idx % 4) + 1} rounded-[2rem] p-8 border transition-all group/feat ${theme !== 'light' ? 'bg-white/5 border-white/5 hover:border-[var(--brand-color)]/40 hover:bg-white/[0.07]' : 'bg-slate-50 border-slate-200 hover:border-[var(--brand-color)]/20 hover:bg-white shadow-sm'}`}
+                  >
+                    <div className="w-14 h-14 text-[var(--brand-color)] mb-8 p-3 rounded-2xl bg-[var(--brand-color)]/10 group-hover/feat:scale-110 group-hover/feat:rotate-[5deg] group-hover/feat:bg-[var(--brand-color)]/20 transition-all duration-500 ease-[cubic-bezier(0.23,1,0.32,1)]">
                       {getFeatureIcon(feature.title, feature.icon)}
                     </div>
-                    <h3 className={`text-xl font-black mb-4 leading-tight ${theme !== 'light' ? 'text-white' : 'text-slate-900'}`}>{feature.title}</h3>
+                    <h3 className={`text-xl font-black mb-4 leading-tight group-hover/feat:text-[var(--brand-color)] transition-colors duration-300 ${theme !== 'light' ? 'text-white' : 'text-slate-900'}`}>{feature.title}</h3>
                     <p className="text-slate-500 text-sm font-bold leading-relaxed">{feature.description}</p>
                   </div>
                 ))}
@@ -170,7 +172,7 @@ const BotDetailView: React.FC<BotDetailViewProps> = ({ bot, theme = 'dark', onBa
           </div>
 
           <div className="space-y-12">
-            <section className={`rounded-[3rem] p-10 border reveal reveal-right ${theme !== 'light' ? 'bg-[#161a23]/50 border-[var(--brand-color)]/10 backdrop-blur-md' : 'bg-white border-slate-200 shadow-md'}`}>
+            <section className={`rounded-[3rem] p-10 border reveal reveal-right active ${theme !== 'light' ? 'bg-[#161a23]/50 border-[var(--brand-color)]/10 backdrop-blur-md' : 'bg-white border-slate-200 shadow-md'}`}>
               <h3 className="text-xl font-black mb-10 uppercase tracking-widest text-slate-500">Live Statistics</h3>
               <div className="space-y-8">
                 <div className="flex justify-between items-center group/stat">
@@ -205,7 +207,7 @@ const BotDetailView: React.FC<BotDetailViewProps> = ({ bot, theme = 'dark', onBa
               </div>
             </section>
 
-            <section className={`rounded-[3rem] p-10 text-center border reveal reveal-right stagger-1 ${theme !== 'light' ? 'bg-[var(--brand-color)]/5 border-[var(--brand-color)]/10 backdrop-blur-md' : 'bg-indigo-50 border-indigo-100'}`}>
+            <section className={`rounded-[3rem] p-10 text-center border reveal reveal-right active stagger-1 ${theme !== 'light' ? 'bg-[var(--brand-color)]/5 border-[var(--brand-color)]/10 backdrop-blur-md' : 'bg-indigo-50 border-indigo-100'}`}>
               <h3 className={`text-xl font-black mb-6 ${theme !== 'light' ? 'text-white' : 'text-slate-900'}`}>Support Hub</h3>
               <p className={`font-bold mb-10 leading-relaxed text-sm ${theme !== 'light' ? 'text-slate-500' : 'text-slate-600'}`}>Need a custom feature or encountered a bug? Our devs are available in the support server.</p>
               <button 

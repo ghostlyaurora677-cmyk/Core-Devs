@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -92,18 +91,73 @@
             75% { transform: translate(-25px, -15px) rotate(1deg); }
         }
 
-        .pulse-glow {
-            animation: pulseGlow 4s ease-in-out infinite;
+        @keyframes float-slow {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-30px) rotate(10deg); }
         }
+
+        @keyframes float-alt {
+            0%, 100% { transform: translate(0, 0) rotate(5deg); }
+            50% { transform: translate(-20px, 20px) rotate(-5deg); }
+        }
+
+        @keyframes spin-slow {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        @keyframes pulse-soft {
+            0%, 100% { transform: scale(1); opacity: 0.05; }
+            50% { transform: scale(1.15); opacity: 0.15; }
+        }
+
+        @keyframes pulse-glow-deep {
+            0%, 100% { filter: blur(2px) drop-shadow(0 0 0px transparent); }
+            50% { filter: blur(4px) drop-shadow(0 0 20px var(--brand-glow)); }
+        }
+
+        @keyframes swing {
+            0%, 100% { transform: translateX(0) rotate(0deg); }
+            50% { transform: translateX(20px) rotate(5deg); }
+        }
+
+        .float-slow { animation: float-slow 20s ease-in-out infinite; }
+        .float-alt { animation: float-alt 18s ease-in-out infinite; }
+        .spin-slow { animation: spin-slow 60s linear infinite; }
+        .pulse-soft { animation: pulse-soft 8s ease-in-out infinite; }
+        .pulse-glow-deep { animation: pulse-glow-deep 6s ease-in-out infinite; }
+        .swing { animation: swing 15s ease-in-out infinite; }
 
         @keyframes pulseGlow {
             0%, 100% { opacity: 0.05; filter: blur(4px); }
             50% { opacity: 0.15; filter: blur(8px); }
         }
 
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-8px); }
+            20%, 40%, 60%, 80% { transform: translateX(8px); }
+        }
+
+        @keyframes nebula {
+            0% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(30px, -50px) scale(1.1); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(0, 0) scale(1); }
+        }
+
+        .shake { animation: shake 0.6s cubic-bezier(.36,.07,.19,.97) both; }
+        .animate-nebula { animation: nebula 20s ease-in-out infinite; }
+
         .selection-brand::selection {
             background: var(--brand-color);
             color: white;
+        }
+
+        /* Smooth View Transition mask */
+        .view-mask {
+            mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
+            -webkit-mask-image: linear-gradient(to bottom, transparent, black 15%, black 85%, transparent);
         }
     </style>
 

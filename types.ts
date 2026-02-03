@@ -62,6 +62,7 @@ export interface User {
   isMaster?: boolean;
   provider: 'staff';
   permissions: StaffPermission[];
+  role: string;
 }
 
-export type ThemeType = 'light' | 'dark' | 'magenta' | 'lime' | 'red' | 'black';
+export type ThemeType = 'light' | 'dark' | 'black';

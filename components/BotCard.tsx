@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { BotInfo, ThemeType } from '../types';
 
@@ -21,26 +20,38 @@ const BotCard: React.FC<BotCardProps> = ({ bot, theme = 'dark', onViewDetails })
     <div 
       className={`reveal group relative overflow-hidden rounded-[3.5rem] p-10 md:p-16 cursor-pointer transition-all duration-700 ease-[cubic-bezier(0.23,1,0.32,1)] touch-manipulation
         ${theme === 'black' ? 'bg-[#080808] border border-white/10' : theme !== 'light' ? 'bg-[#161a23] border border-white/5 shadow-2xl' : 'bg-white border border-slate-200 shadow-md'}
-        hover:-translate-y-5 hover:border-[var(--brand-color)]/50 hover:shadow-[0_60px_120px_var(--brand-glow)] active:scale-[0.98] active:shadow-[0_20px_40px_var(--brand-glow)]`}
+        hover:-translate-y-4 hover:scale-[1.03] hover:border-[var(--brand-color)]/40 hover:shadow-[0_0_80px_var(--brand-glow)] active:scale-[0.98] active:shadow-[0_20px_40px_var(--brand-glow)]`}
       onClick={() => onViewDetails(bot)}
     >
-      <div className="absolute inset-0 opacity-0 group-hover:opacity-[0.08] transition-opacity duration-700 bg-gradient-to-br from-[var(--brand-color)] via-transparent to-transparent"></div>
+      {/* Dynamic Background Glow Overlay */}
+      <div className="absolute inset-0 opacity-0 group-hover:opacity-[0.25] transition-opacity duration-700 bg-gradient-to-br from-[var(--brand-color)] via-transparent to-transparent"></div>
       
+      {/* Decorative Background Letter */}
       <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:opacity-[0.15] transition-all duration-700 select-none group-hover:rotate-[15deg] group-hover:scale-[1.5]">
         <span className="text-[18rem] font-black leading-none pointer-events-none" style={{ color: bot.color }}>{bot.name.charAt(0)}</span>
       </div>
 
       <div className="flex flex-col lg:flex-row items-center lg:items-center gap-14 relative z-10">
-        <div className="relative transition-all duration-700 group-hover:scale-105 group-hover:rotate-[-1deg]">
-          <div className={`w-44 h-44 md:w-64 md:h-64 rounded-[3rem] overflow-hidden ring-8 transition-all duration-700 shadow-[0_40px_80px_rgba(0,0,0,0.6)] ${theme === 'black' ? 'ring-white/5 bg-black' : theme !== 'light' ? 'ring-white/5 group-hover:ring-[var(--brand-color)]/30 bg-slate-900' : 'ring-slate-100 group-hover:ring-[var(--brand-color)]/10 bg-slate-50'}`}>
+        <div className="relative transition-all duration-1000 group-hover:scale-110 group-hover:rotate-[-2deg]">
+          {/* Avatar Container */}
+          <div className={`w-44 h-44 md:w-64 md:h-64 rounded-[3rem] overflow-hidden ring-8 transition-all duration-700 shadow-[0_40px_80px_rgba(0,0,0,0.6)] group-hover:shadow-[0_0_60px_var(--brand-glow)] group-hover:ring-[var(--brand-color)]/60 ${theme === 'black' ? 'ring-white/5 bg-black' : theme !== 'light' ? 'ring-white/5 bg-slate-900' : 'ring-slate-100 bg-slate-50'}`}>
             <img 
               src={imgSrc} 
               alt={bot.name} 
-              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700" 
+              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-1000 ease-out" 
               onError={handleError}
               loading="lazy"
             />
           </div>
+
+          {/* Subtly Animated Discord Boost Icon Overlay */}
+          <div className="absolute -top-4 -left-4 w-12 h-12 bg-pink-500 rounded-2xl flex items-center justify-center shadow-xl border-[6px] transition-all duration-700 pulse-soft rotate-[-12deg] group-hover:rotate-0 group-hover:scale-125 group-hover:bg-pink-400" style={{ borderColor: theme === 'black' ? '#080808' : theme !== 'light' ? '#161a23' : '#fff' }}>
+            <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 2L16.5 6.5L12 11L7.5 6.5L12 2ZM12 13L16.5 17.5L12 22L7.5 17.5L12 13Z"/>
+            </svg>
+          </div>
+
+          {/* Status Indicator */}
           <div className="absolute -bottom-4 -right-4 w-12 h-12 bg-emerald-500 border-[8px] border-current rounded-full flex items-center justify-center shadow-2xl" style={{ borderColor: theme === 'black' ? '#080808' : theme !== 'light' ? '#161a23' : '#fff' }}>
             <div className="w-3 h-3 bg-white rounded-full animate-pulse shadow-[0_0_15px_white]"></div>
           </div>
@@ -73,14 +84,14 @@ const BotCard: React.FC<BotCardProps> = ({ bot, theme = 'dark', onViewDetails })
 
           <div className="flex flex-col sm:flex-row justify-center lg:justify-start gap-5">
              <button 
-               className={`px-12 py-6 rounded-[1.5rem] font-black text-xs uppercase tracking-widest transition-all bg-[var(--brand-color)] hover:bg-white hover:text-black active:scale-95 shadow-[0_25px_50px_var(--brand-glow)] flex items-center justify-center gap-4 ${theme === 'black' ? 'text-black' : 'text-white'}`}
+               className={`px-12 py-6 rounded-[1.5rem] font-black text-xs uppercase tracking-widest transition-all bg-[var(--brand-color)] hover:bg-white hover:text-black hover:scale-105 hover:-translate-y-1 active:scale-95 shadow-[0_25px_50px_var(--brand-glow)] flex items-center justify-center gap-4 group/btn ${theme === 'black' ? 'text-black' : 'text-white'}`}
                onClick={(e) => {
                  e.stopPropagation();
                  onViewDetails(bot);
                }}
              >
                Interface Details
-               <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
+               <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5 transition-transform duration-500 ease-[cubic-bezier(0.23,1,0.32,1)] group-hover/btn:translate-x-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M14 5l7 7m0 0l-7 7m7-7H3" /></svg>
              </button>
           </div>
         </div>

@@ -28,21 +28,22 @@ const IconMap = {
   )
 };
 
-const ResourceCard: React.FC<ResourceCardProps> = ({ resource, theme = 'dark', user, onLoginRequest }) => {
+const ResourceCard: React.FC<ResourceCardProps> = ({ resource, theme = 'dark' }) => {
   const [isCopied, setIsCopied] = useState(false);
   const [isRevealed, setIsRevealed] = useState(false);
 
+  const handleCopy = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    navigator.clipboard.writeText(resource.content);
+    setIsCopied(true);
+    setTimeout(() => setIsCopied(false), 2000);
+  };
+
   const handleAction = () => {
-    if (!user) {
-      if (onLoginRequest) onLoginRequest();
-      return;
-    }
     if (resource.type === 'TOOL') {
       window.open(resource.content, '_blank');
     } else {
-      navigator.clipboard.writeText(resource.content);
-      setIsCopied(true);
-      setTimeout(() => setIsCopied(false), 2000);
+      setIsRevealed(!isRevealed);
     }
   };
 
@@ -80,63 +81,42 @@ const ResourceCard: React.FC<ResourceCardProps> = ({ resource, theme = 'dark', u
       </div>
 
       <div className="space-y-4 relative z-10">
-        <div className="relative group/content overflow-hidden">
-          {user ? (
-            <div className={`rounded-2xl p-5 font-mono text-xs overflow-hidden break-all min-h-[60px] flex items-center border transition-all ${resource.type === 'API_KEY' && !isRevealed ? 'blur-sm select-none' : ''} ${theme === 'black' ? 'bg-white/5 text-slate-300 border-white/10' : theme !== 'light' ? 'bg-black/40 text-slate-300 border-white/5 group-hover/content:border-white/20' : 'bg-slate-50 text-slate-700 border-slate-200 group-hover/content:border-[var(--brand-color)]/20'}`}>
-              {resource.type === 'TOOL' ? resource.content.replace('https://', '') : resource.content}
-            </div>
-          ) : (
-            <div 
-              onClick={handleAction}
-              className={`rounded-2xl p-8 flex flex-col items-center justify-center gap-3 border border-dashed cursor-pointer transition-all min-h-[100px] hover:bg-indigo-600/5 ${theme !== 'light' ? 'bg-black/40 border-white/10' : 'bg-slate-50 border-slate-300'}`}
-            >
-              <svg className="w-6 h-6 text-indigo-500 animate-pulse" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 00-2 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-indigo-400">Login to Access Infrastructure</span>
+        <div 
+          onClick={handleAction}
+          className="relative group/content overflow-hidden cursor-pointer"
+        >
+          <div className={`rounded-2xl p-5 font-mono text-xs overflow-hidden break-all min-h-[60px] flex items-center border transition-all duration-500 ${!isRevealed && resource.type !== 'TOOL' ? 'blur-md select-none' : 'blur-0'} ${theme === 'black' ? 'bg-white/5 text-slate-300 border-white/10' : theme !== 'light' ? 'bg-black/40 text-slate-300 border-white/5 group-hover/content:border-white/20' : 'bg-slate-50 text-slate-700 border-slate-200 group-hover/content:border-[var(--brand-color)]/20'}`}>
+            {resource.type === 'TOOL' ? resource.content.replace('https://', '') : resource.content}
+          </div>
+          
+          {!isRevealed && resource.type !== 'TOOL' && (
+            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+               <span className="text-[9px] font-black uppercase tracking-[0.3em] text-white/40 group-hover/content:text-white/80 transition-colors animate-pulse">Click to decrypt</span>
             </div>
           )}
           
-          {user && (
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 flex gap-2 opacity-0 group-hover/content:opacity-100 transition-all duration-300">
-              {resource.type === 'API_KEY' && (
-                <button 
-                  onClick={() => setIsRevealed(!isRevealed)}
-                  className={`p-3 rounded-xl transition-all backdrop-blur-md border ${theme !== 'light' ? 'bg-white/10 text-white border-white/10 hover:bg-white/20' : 'bg-white/80 text-slate-600 border-slate-200 hover:bg-white'}`}
-                >
-                  {isRevealed ? (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
-                    </svg>
-                  ) : (
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268-2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                  )}
-                </button>
+          <div className="absolute right-3 top-1/2 -translate-y-1/2 flex gap-2">
+            <button 
+              onClick={handleCopy}
+              className={`p-3 rounded-xl transition-all shadow-lg active:scale-90 ${resource.type === 'TOOL' ? 'bg-purple-600 hover:bg-purple-500 text-white' : `bg-[var(--brand-color)] hover:opacity-90 ${theme === 'black' ? 'text-black' : 'text-white'}`}`}
+              title="Copy to Clipboard"
+            >
+              {isCopied ? (
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+              ) : resource.type === 'TOOL' ? (
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+              ) : (
+                <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
+                  <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
+                  <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002 2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
+                </svg>
               )}
-              <button 
-                onClick={handleAction}
-                className={`p-3 rounded-xl transition-all shadow-lg active:scale-90 ${resource.type === 'TOOL' ? 'bg-purple-600 hover:bg-purple-500 text-white' : `bg-[var(--brand-color)] hover:opacity-90 ${theme === 'black' ? 'text-black' : 'text-white'}`}`}
-              >
-                {isCopied ? (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-                    <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
-                  </svg>
-                ) : resource.type === 'TOOL' ? (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-                  </svg>
-                ) : (
-                  <svg xmlns="http://www.w3.org/2000/svg" className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor">
-                    <path d="M8 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" />
-                    <path d="M6 3a2 2 0 00-2 2v11a2 2 0 002 2h8a2 2 0 002 2V5a2 2 0 00-2-2 3 3 0 01-3 3H9a3 3 0 01-3-3z" />
-                  </svg>
-                )}
-              </button>
-            </div>
-          )}
+            </button>
+          </div>
         </div>
       </div>
     </div>

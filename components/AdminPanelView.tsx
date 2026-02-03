@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { Resource, ResourceType, Feedback, StaffAccount, User, StaffPermission } from '../types';
+import { Resource, ResourceType, Feedback, StaffAccount, User, StaffPermission, ThemeType } from '../types';
 import { databaseService } from '../services/databaseService';
 
 interface AdminPanelViewProps {
@@ -13,32 +12,32 @@ interface AdminPanelViewProps {
   onDeleteFeedback: (id: string) => void;
   onClearAllFeedback: () => void;
   onBack: () => void;
+  theme?: ThemeType;
 }
 
-type SortOption = 'username' | 'role' | 'permissionsCount';
-type FilterOption = 'ALL' | StaffPermission;
 type StaffRole = 'Owner' | 'Manager' | 'Admin' | 'Staff';
 
+const PERMISSION_OPTS: { id: StaffPermission; label: string; desc: string }[] = [
+  { id: 'VAULT_VIEW', label: 'Vault Access', desc: 'Can view cloud infrastructure keys and assets.' },
+  { id: 'VAULT_EDIT', label: 'Archive Management', desc: 'Can add, update, or delete entries in the Vault.' },
+  { id: 'FEEDBACK_MANAGE', label: 'Signal Control', desc: 'Can manage user feedback logs and signals.' }
+];
+
 const AdminPanelView: React.FC<AdminPanelViewProps> = ({ 
-  user, resources, feedbacks, onAdd, onUpdate, onDelete, onDeleteFeedback, onClearAllFeedback, onBack 
+  user, resources, feedbacks, onAdd, onUpdate, onDelete, onDeleteFeedback, onClearAllFeedback, onBack, theme = 'dark'
 }) => {
   const [activeTab, setActiveTab] = useState<'assets' | 'feedback' | 'staff'>('assets');
   const [editingId, setEditingId] = useState<string | null>(null);
   const [isAdding, setIsAdding] = useState(false);
-  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
-  const [clearFeedbackConfirm, setClearFeedbackConfirm] = useState(false);
 
-  // Staff management state (Strictly Master Only)
+  // Staff management state
   const [staffAccounts, setStaffAccounts] = useState<StaffAccount[]>([]);
+  const [editingStaffId, setEditingStaffId] = useState<string | null>(null);
   const [newStaffUsername, setNewStaffUsername] = useState('');
   const [newStaffPassword, setNewStaffPassword] = useState('');
   const [newStaffRole, setNewStaffRole] = useState<StaffRole>('Staff');
   const [newStaffPermissions, setNewStaffPermissions] = useState<StaffPermission[]>(['VAULT_VIEW']);
-  const [creationStatus, setCreationStatus] = useState<'idle' | 'success'>('idle');
-
-  // Sorting and Filtering state
-  const [sortBy, setSortBy] = useState<SortOption>('username');
-  const [filterBy, setFilterBy] = useState<FilterOption>('ALL');
+  const [creationStatus, setCreationStatus] = useState<'idle' | 'success' | 'updated'>('idle');
 
   const [formData, setFormData] = useState<Partial<Resource>>({
     title: '', description: '', type: 'API_KEY', content: '', tags: []
@@ -46,7 +45,6 @@ const AdminPanelView: React.FC<AdminPanelViewProps> = ({
 
   const staffRoles: StaffRole[] = ['Owner', 'Manager', 'Admin', 'Staff'];
 
-  // Permission verification helper
   const hasPermission = (perm: StaffPermission) => {
     if (user?.isMaster) return true;
     return user?.permissions?.includes(perm);
@@ -56,19 +54,11 @@ const AdminPanelView: React.FC<AdminPanelViewProps> = ({
     if (user?.isMaster) {
       databaseService.getStaffAccounts().then(setStaffAccounts);
     }
-    
-    // Unauthorized tab redirection
-    if (activeTab === 'assets' && !hasPermission('VAULT_VIEW')) {
-      setActiveTab('feedback');
-    }
-    if (activeTab === 'staff' && !user?.isMaster) {
-      setActiveTab('assets');
-    }
   }, [user]);
 
-  const handleSave = () => {
+  const handleSaveResource = () => {
     if (!hasPermission('VAULT_EDIT')) return alert('Security Error: Unauthorized Modification Attempt');
-    if (!formData.title || !formData.content) return alert('Title and Content are mandatory for vault storage.');
+    if (!formData.title || !formData.content) return alert('Title and Content are mandatory.');
     
     if (editingId) {
       onUpdate({ ...formData, id: editingId } as Resource);
@@ -79,369 +69,384 @@ const AdminPanelView: React.FC<AdminPanelViewProps> = ({
         createdAt: new Date().toISOString().split('T')[0]
       } as Resource);
     }
-    resetForm();
+    resetResourceForm();
   };
 
-  const togglePermission = (perm: StaffPermission) => {
+  const handleTogglePermission = (perm: StaffPermission) => {
     setNewStaffPermissions(prev => 
       prev.includes(perm) ? prev.filter(p => p !== perm) : [...prev, perm]
     );
   };
 
-  const handleAddStaff = async () => {
-    if (!user?.isMaster) return alert('Protocol Violation: Only System Owner can authorize personnel');
-    if (!newStaffUsername || !newStaffPassword) return alert('All credentials fields must be populated');
+  const handleAddOrUpdateStaff = async () => {
+    if (!user?.isMaster) return alert('Protocol Violation: System Owner authorization required.');
+    if (!newStaffUsername || !newStaffPassword) return alert('All fields required.');
     
-    const newAcc: StaffAccount = {
-      id: Math.random().toString(36).substr(2, 9),
-      username: newStaffUsername,
-      password: newStaffPassword,
-      role: newStaffRole,
-      permissions: newStaffPermissions
-    };
-    
-    await databaseService.addStaffAccount(newAcc);
-    setStaffAccounts([...staffAccounts, newAcc]);
-    setNewStaffUsername('');
-    setNewStaffPassword('');
-    setNewStaffRole('Staff');
-    setNewStaffPermissions(['VAULT_VIEW']);
-    setCreationStatus('success');
+    if (editingStaffId) {
+      const updatedAcc: StaffAccount = {
+        id: editingStaffId,
+        username: newStaffUsername,
+        password: newStaffPassword,
+        role: newStaffRole,
+        permissions: newStaffPermissions
+      };
+      await databaseService.updateStaffAccount(updatedAcc);
+      setStaffAccounts(prev => prev.map(s => s.id === editingStaffId ? updatedAcc : s));
+      setCreationStatus('updated');
+    } else {
+      const newAcc: StaffAccount = {
+        id: Math.random().toString(36).substr(2, 9),
+        username: newStaffUsername,
+        password: newStaffPassword,
+        role: newStaffRole,
+        permissions: newStaffPermissions
+      };
+      await databaseService.addStaffAccount(newAcc);
+      setStaffAccounts([...staffAccounts, newAcc]);
+      setCreationStatus('success');
+    }
+
+    resetStaffForm();
     setTimeout(() => setCreationStatus('idle'), 3000);
   };
 
-  const handleDeleteStaff = async (id: string) => {
-    if (!user?.isMaster) return;
-    await databaseService.deleteStaffAccount(id);
-    setStaffAccounts(staffAccounts.filter(s => s.id !== id));
+  const startEditStaff = (staff: StaffAccount) => {
+    setEditingStaffId(staff.id);
+    setNewStaffUsername(staff.username);
+    setNewStaffPassword(staff.password);
+    setNewStaffRole(staff.role as StaffRole);
+    setNewStaffPermissions(staff.permissions);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const resetForm = () => {
+  const deleteStaff = async (id: string) => {
+    if (confirm('Delete this operator permanently?')) {
+      await databaseService.deleteStaffAccount(id);
+      setStaffAccounts(prev => prev.filter(s => s.id !== id));
+    }
+  };
+
+  const resetResourceForm = () => {
     setFormData({ title: '', description: '', type: 'API_KEY', content: '', tags: [] });
     setEditingId(null);
     setIsAdding(false);
   };
 
-  const startEdit = (res: Resource) => {
-    if (!hasPermission('VAULT_EDIT')) return;
+  const resetStaffForm = () => {
+    setEditingStaffId(null);
+    setNewStaffUsername('');
+    setNewStaffPassword('');
+    setNewStaffRole('Staff');
+    setNewStaffPermissions(['VAULT_VIEW']);
+  };
+
+  const startEditResource = (res: Resource) => {
     setFormData(res);
     setEditingId(res.id);
     setIsAdding(true);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  // Process staff roster
-  const processedStaff = [...staffAccounts]
-    .filter(s => filterBy === 'ALL' || s.permissions.includes(filterBy as StaffPermission))
-    .sort((a, b) => {
-      if (sortBy === 'username') return a.username.localeCompare(b.username);
-      if (sortBy === 'role') return a.role.localeCompare(b.role);
-      if (sortBy === 'permissionsCount') return (b.permissions?.length || 0) - (a.permissions?.length || 0);
-      return 0;
-    });
+  const stats = [
+    { label: 'Vault Items', value: resources.length, icon: '📦' },
+    { label: 'Unresolved Logs', value: feedbacks.length, icon: '📝' },
+    { label: 'Authorized Staff', value: staffAccounts.length + 1, icon: '🛡️' },
+    { label: 'System Uptime', value: '100%', icon: '🟢' }
+  ];
+
+  const inputClasses = `w-full border rounded-2xl px-6 py-4 outline-none focus:border-indigo-500 transition-all font-bold ${
+    theme === 'light' 
+      ? 'bg-slate-50 border-slate-200 text-slate-900 placeholder:text-slate-400' 
+      : 'bg-white/5 border-white/10 text-white placeholder:text-slate-600'
+  }`;
 
   return (
-    <div className="min-h-screen bg-black text-white pt-24 px-6 pb-20 fade-in relative overflow-x-hidden">
-      {/* Universal Confirmation Modal */}
-      {(deleteConfirmId || clearFeedbackConfirm) && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center px-6">
-          <div className="absolute inset-0 bg-black/90 backdrop-blur-sm" onClick={() => { setDeleteConfirmId(null); setClearFeedbackConfirm(false); }}></div>
-          <div className="relative glass p-12 rounded-[3.5rem] border-red-500/30 max-w-sm w-full text-center">
-            <div className="w-20 h-20 bg-red-500/10 rounded-full flex items-center justify-center mx-auto mb-8">
-              <svg className="w-10 h-10 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-            </div>
-            <h3 className="text-3xl font-black mb-4 text-white uppercase tracking-tighter">Authorize Purge?</h3>
-            <p className="text-slate-500 text-[10px] font-black uppercase tracking-widest mb-10 leading-relaxed">System override detected. Purging data will permanently remove the entry from our encrypted buffers.</p>
-            <div className="flex gap-4">
-              <button onClick={() => { setDeleteConfirmId(null); setClearFeedbackConfirm(false); }} className="flex-1 py-5 glass rounded-2xl text-[9px] font-black uppercase tracking-widest hover:bg-white/5 transition-all">Abort</button>
-              <button onClick={() => {
-                if (deleteConfirmId) {
-                  if (activeTab === 'assets') onDelete(deleteConfirmId);
-                  else if (activeTab === 'feedback') onDeleteFeedback(deleteConfirmId);
-                  else if (activeTab === 'staff') handleDeleteStaff(deleteConfirmId);
-                  setDeleteConfirmId(null);
-                } else if (clearFeedbackConfirm) {
-                  onClearAllFeedback();
-                  setClearFeedbackConfirm(false);
-                }
-              }} className="flex-1 py-5 bg-red-600 rounded-2xl text-[9px] font-black uppercase tracking-widest hover:bg-red-500 shadow-2xl shadow-red-600/30 transition-all">Confirm</button>
-            </div>
+    <div className="max-w-7xl mx-auto px-6 py-12 pb-32 reveal active reveal-up">
+      {/* Dashboard Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-16">
+        {stats.map((s, idx) => (
+          <div key={idx} className={`glass p-8 rounded-[2.5rem] border shadow-2xl group hover:-translate-y-2 transition-all ${theme === 'light' ? 'bg-white border-slate-200' : 'border-white/5'}`}>
+            <div className="text-3xl mb-4 group-hover:scale-110 transition-transform inline-block">{s.icon}</div>
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-500 mb-1">{s.label}</p>
+            <p className={`text-3xl font-black ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{s.value}</p>
           </div>
-        </div>
-      )}
+        ))}
+      </div>
 
-      <div className="max-w-6xl mx-auto">
-        {/* Terminal Header */}
-        <div className="flex flex-col md:flex-row md:justify-between md:items-center mb-16 gap-10">
-          <div>
-            <div className="flex items-center gap-5 mb-4">
-              <div className="w-3 h-10 bg-indigo-500 rounded-full glow"></div>
-              <h1 className="text-6xl font-black uppercase tracking-tighter">Command Center</h1>
-            </div>
-            <div className="flex items-center gap-4">
-              <span className="text-slate-500 text-[10px] font-black uppercase tracking-[0.3em]">
-                Active Terminal: <span className="text-white">{user?.username}</span>
-              </span>
-              {user?.isMaster && <span className="px-4 py-1.5 bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[9px] font-black uppercase tracking-widest rounded-full">Primary Owner</span>}
-            </div>
-          </div>
-          <div className="flex gap-5">
-            <button onClick={onBack} className="px-8 py-4 rounded-2xl bg-white/5 border border-white/10 text-slate-400 text-[10px] font-black uppercase tracking-widest hover:bg-red-600/10 hover:text-red-400 hover:border-red-500/20 transition-all">Disconnect</button>
-            {activeTab === 'assets' && hasPermission('VAULT_EDIT') && (
-              <button onClick={() => setIsAdding(true)} className="px-10 py-4 rounded-2xl bg-indigo-600 text-white text-[10px] font-black uppercase tracking-widest shadow-2xl shadow-indigo-600/30 hover:scale-105 active:scale-95 transition-all">New Infrastructure Asset</button>
-            )}
-          </div>
-        </div>
-
-        {/* Tab Selection */}
-        <div className="flex gap-4 mb-16 border-b border-white/5 pb-5 overflow-x-auto no-scrollbar">
-          {hasPermission('VAULT_VIEW') && (
-            <button 
-              onClick={() => setActiveTab('assets')} 
-              className={`px-8 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'assets' ? 'bg-indigo-600 text-white shadow-2xl shadow-indigo-600/20' : 'text-slate-500 hover:text-white hover:bg-white/5'}`}
+      <div className="flex flex-col lg:flex-row gap-12">
+        {/* Sidebar Nav */}
+        <div className="lg:w-64 space-y-4 shrink-0">
+          <p className="text-[10px] font-black uppercase tracking-[0.4em] text-indigo-500 mb-6 px-4 text-center lg:text-left">Navigation HQ</p>
+          {[
+            { id: 'assets', label: 'Asset Vault', icon: '💎' },
+            { id: 'feedback', label: 'User Feedback', icon: '📬' },
+            { id: 'staff', label: 'Staff Management', icon: '👤', hidden: !user?.isMaster }
+          ].map((tab) => !tab.hidden && (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id as any)}
+              className={`w-full flex items-center gap-4 px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-widest transition-all ${
+                activeTab === tab.id 
+                ? 'bg-indigo-600 text-white shadow-[0_0_30px_rgba(79,70,229,0.4)]' 
+                : theme === 'light' ? 'text-slate-500 hover:text-slate-900 hover:bg-slate-100' : 'text-slate-500 hover:text-white hover:bg-white/5'
+              }`}
             >
-              Vault Assets
+              <span className="text-lg">{tab.icon}</span>
+              {tab.label}
             </button>
-          )}
-          <button 
-            onClick={() => setActiveTab('feedback')} 
-            className={`px-8 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all relative ${activeTab === 'feedback' ? 'bg-indigo-600 text-white shadow-2xl shadow-indigo-600/20' : 'text-slate-500 hover:text-white hover:bg-white/5'}`}
-          >
-            Incoming Intelligence
-            {feedbacks.length > 0 && <span className="absolute -top-2 -right-2 w-7 h-7 bg-red-600 text-white rounded-full flex items-center justify-center text-[11px] font-black border-4 border-black">{feedbacks.length}</span>}
-          </button>
-          {user?.isMaster && (
-            <button 
-              onClick={() => setActiveTab('staff')} 
-              className={`px-8 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${activeTab === 'staff' ? 'bg-purple-600 text-white shadow-2xl shadow-purple-600/20 border border-purple-500/20' : 'text-slate-500 hover:text-white hover:bg-white/5'}`}
-            >
-              Personnel Hub
-            </button>
-          )}
+          ))}
         </div>
 
-        {/* Vault Management */}
-        {activeTab === 'assets' && hasPermission('VAULT_VIEW') && (
-          <div className="space-y-6">
-            {isAdding && hasPermission('VAULT_EDIT') && (
-              <div className="glass rounded-[4rem] p-12 mb-16 border-indigo-500/20 animate-in zoom-in-95 relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-indigo-500 to-transparent"></div>
-                <h2 className="text-3xl font-black mb-12 uppercase tracking-tighter">{editingId ? 'Patching Active Asset' : 'Initializing New Protocol'}</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                  <div className="space-y-8">
-                    <div className="space-y-3">
-                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Asset Alias</label>
-                      <input className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-5 text-sm outline-none focus:border-indigo-500 transition-all font-medium" placeholder="Target Identifier" value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})} />
-                    </div>
-                    <div className="space-y-3">
-                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Infrastructure Class</label>
-                      <select className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-5 text-sm outline-none focus:border-indigo-500 transition-all appearance-none cursor-pointer" value={formData.type} onChange={e => setFormData({...formData, type: e.target.value as ResourceType})}>
-                        <option value="API_KEY">Security Token / Key</option>
-                        <option value="CODE_SNIPPET">Developer Protocol</option>
-                        <option value="TOOL">Infrastructure Gateway</option>
-                      </select>
-                    </div>
-                  </div>
-                  <div className="space-y-3">
-                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-1">Secure Loadout</label>
-                    <textarea className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-5 text-sm h-full min-h-[180px] font-mono outline-none focus:border-indigo-500 transition-all" placeholder="Enter payload details..." value={formData.content} onChange={e => setFormData({...formData, content: e.target.value})} />
-                  </div>
+        {/* Content Area */}
+        <div className="flex-1 min-h-[600px]">
+          {activeTab === 'assets' && (
+            <div className="space-y-8 reveal active reveal-right">
+              <div className="flex flex-col md:flex-row justify-between items-center md:items-end gap-6 mb-8">
+                <div>
+                  <h2 className={`text-4xl font-black uppercase tracking-tighter mb-2 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>Asset <span className="text-indigo-500">Vault</span></h2>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Manage sensitive cloud infrastructure and keys</p>
                 </div>
-                <div className="flex justify-end gap-6 mt-12">
-                  <button onClick={resetForm} className="text-slate-500 font-black uppercase text-[10px] tracking-widest hover:text-white transition-colors">Discard Draft</button>
-                  <button onClick={handleSave} className="bg-indigo-600 px-12 py-5 rounded-2xl font-black uppercase text-[10px] tracking-widest shadow-2xl shadow-indigo-600/20 hover:scale-105 active:scale-95 transition-all">Deploy to Vault</button>
-                </div>
+                {hasPermission('VAULT_EDIT') && (
+                  <button onClick={() => setIsAdding(!isAdding)} className={`px-8 py-4 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all shadow-xl ${isAdding ? 'bg-red-500/10 text-red-500 border border-red-500/20' : 'bg-indigo-600 text-white shadow-indigo-600/20 hover:bg-indigo-500'}`}>
+                    {isAdding ? 'Close Editor' : 'Register New Key'}
+                  </button>
+                )}
               </div>
-            )}
-            <div className="grid grid-cols-1 gap-4">
-              {resources.map(res => (
-                <div key={res.id} className="glass p-10 rounded-[3rem] flex items-center justify-between group border-white/5 hover:border-white/10 transition-all">
-                  <div className="flex items-center gap-10">
-                    <div className={`w-16 h-16 rounded-3xl flex items-center justify-center font-black text-2xl ${res.type === 'API_KEY' ? 'bg-amber-500/10 text-amber-500 border border-amber-500/20' : res.type === 'CODE_SNIPPET' ? 'bg-indigo-500/10 text-indigo-500 border border-indigo-500/20' : 'bg-purple-500/10 text-purple-500 border border-purple-500/20'}`}>
-                      {res.type.charAt(0)}
+
+              {isAdding && (
+                <div className={`glass p-10 rounded-[3rem] border mb-12 animate-in slide-in-from-top-4 duration-500 ${theme === 'light' ? 'bg-white border-slate-200 shadow-xl' : 'border-white/10'}`}>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                    <div className="space-y-3">
+                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">Display Name</label>
+                      <input 
+                        value={formData.title} 
+                        onChange={e => setFormData({...formData, title: e.target.value})} 
+                        className={inputClasses}
+                        placeholder="Internal Identifier"
+                      />
                     </div>
-                    <div>
-                      <h3 className="font-black text-3xl mb-1 group-hover:text-indigo-400 transition-colors uppercase tracking-tighter">{res.title}</h3>
-                      <div className="flex gap-5 items-center">
-                         <span className="text-slate-500 text-[10px] font-black uppercase tracking-widest">{res.type.replace('_', ' ')}</span>
-                         <span className="w-1.5 h-1.5 bg-white/10 rounded-full"></span>
-                         <span className="text-slate-600 text-[10px] font-black uppercase tracking-widest">{res.createdAt}</span>
+                    <div className="space-y-3">
+                      <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">Type Category</label>
+                      <div className="relative group">
+                        <select 
+                          value={formData.type} 
+                          onChange={e => setFormData({...formData, type: e.target.value as ResourceType})} 
+                          className={`${inputClasses} appearance-none cursor-pointer pr-12`}
+                        >
+                          <option value="API_KEY" className={theme === 'light' ? 'text-slate-900' : 'text-white bg-[#1a1c22]'}>API Secret</option>
+                          <option value="CODE_SNIPPET" className={theme === 'light' ? 'text-slate-900' : 'text-white bg-[#1a1c22]'}>Logic Snippet</option>
+                          <option value="TOOL" className={theme === 'light' ? 'text-slate-900' : 'text-white bg-[#1a1c22]'}>External Node</option>
+                        </select>
+                        <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500 group-hover:text-indigo-500 transition-colors">
+                          <svg xmlns="http://www.w3.org/2000/svg" className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" />
+                          </svg>
+                        </div>
                       </div>
                     </div>
                   </div>
-                  {hasPermission('VAULT_EDIT') && (
-                    <div className="flex gap-4">
-                      <button onClick={() => startEdit(res)} className="w-14 h-14 flex items-center justify-center bg-white/5 rounded-2xl text-slate-500 hover:text-white hover:bg-white/10 transition-all"><svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" /></svg></button>
-                      <button onClick={() => setDeleteConfirmId(res.id)} className="w-14 h-14 flex items-center justify-center bg-white/5 rounded-2xl text-slate-500 hover:text-red-500 hover:bg-red-500/10 transition-all"><svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>
-                    </div>
-                  )}
+                  <div className="space-y-3 mb-8">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">Data Payload</label>
+                    <textarea 
+                      value={formData.content} 
+                      onChange={e => setFormData({...formData, content: e.target.value})} 
+                      className={`${inputClasses} font-mono text-sm h-32 resize-none`}
+                      placeholder="Paste sensitive data here..."
+                    />
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-4">
+                    <button onClick={handleSaveResource} className="px-10 py-5 bg-indigo-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-500 transition-all shadow-xl shadow-indigo-600/20">Commit to Database</button>
+                    <button onClick={resetResourceForm} className={`px-10 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${theme === 'light' ? 'bg-slate-200 text-slate-600 hover:bg-slate-300' : 'glass hover:bg-white/10'}`}>Abort</button>
+                  </div>
                 </div>
-              ))}
-              {resources.length === 0 && <div className="text-center py-40 opacity-20 text-[11px] font-black uppercase tracking-[0.5em] border-2 border-dashed border-white/5 rounded-[4rem]">No active infrastructure segments</div>}
+              )}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {resources.map(res => (
+                  <div key={res.id} className={`glass p-8 rounded-3xl border transition-all group ${theme === 'light' ? 'bg-white border-slate-200' : 'border-white/5 hover:border-[var(--brand-color)]/30'}`}>
+                    <div className="flex justify-between items-start mb-4">
+                      <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-xl group-hover:scale-110 transition-transform ${theme === 'light' ? 'bg-slate-50' : 'bg-white/5'}`}>
+                        {res.type === 'API_KEY' ? '🔑' : res.type === 'CODE_SNIPPET' ? '📜' : '🛠️'}
+                      </div>
+                      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-all">
+                        <button onClick={() => startEditResource(res)} className="p-2 hover:text-indigo-400"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg></button>
+                        <button onClick={() => onDelete(res.id)} className="p-2 hover:text-red-500"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>
+                      </div>
+                    </div>
+                    <h4 className={`text-xl font-black mb-1 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{res.title}</h4>
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-500 mb-4">Created: {res.createdAt}</p>
+                    <div className={`rounded-xl p-4 border font-mono text-[10px] text-slate-400 truncate ${theme === 'light' ? 'bg-slate-50 border-slate-100' : 'bg-black/40 border-white/5'}`}>
+                      {res.content}
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {/* Feedback Monitoring */}
-        {activeTab === 'feedback' && (
-          <div className="space-y-6">
-            {feedbacks.length === 0 ? (
-              <div className="text-center py-40 opacity-20 text-[11px] font-black uppercase tracking-[0.5em] border-2 border-dashed border-white/5 rounded-[4rem]">No intelligence reports collected</div>
-            ) : (
-              feedbacks.map(f => (
-                <div key={f.id} className="glass p-12 rounded-[3.5rem] border-white/5 relative group hover:border-white/10 transition-all">
-                  <div className="flex justify-between items-start mb-8">
-                    <div className="flex items-center gap-5">
-                      <span className={`px-6 py-2.5 rounded-xl text-[10px] font-black border uppercase tracking-widest ${f.type === 'BUG' ? 'bg-red-500/10 border-red-500/20 text-red-500' : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500'}`}>{f.type}</span>
-                      <span className="text-slate-600 text-[10px] font-black uppercase tracking-widest">{new Date(f.timestamp).toLocaleString()}</span>
-                    </div>
-                    {hasPermission('FEEDBACK_MANAGE') && (
-                      <button onClick={() => setDeleteConfirmId(f.id)} className="opacity-0 group-hover:opacity-100 transition-all text-slate-600 hover:text-red-500 p-3"><svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg></button>
-                    )}
-                  </div>
-                  <p className="text-slate-300 font-medium text-xl leading-relaxed">{f.message}</p>
+          {activeTab === 'feedback' && (
+            <div className="space-y-8 reveal active reveal-right">
+              <div className="flex flex-col md:flex-row justify-between items-center md:items-end gap-6 mb-8">
+                <div>
+                  <h2 className={`text-4xl font-black uppercase tracking-tighter mb-2 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>User <span className="text-indigo-500">Feedback</span></h2>
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">Public logs and community signals</p>
                 </div>
-              ))
-            )}
-          </div>
-        )}
-
-        {/* Personnel Hub (Master Access Only) */}
-        {activeTab === 'staff' && user?.isMaster && (
-          <div className="space-y-16 animate-in slide-in-from-right-10 duration-700">
-            {/* Staff Onboarding Card */}
-            <div className="glass rounded-[4rem] p-12 border-white/5 relative overflow-hidden group/card shadow-[0_50px_100px_rgba(0,0,0,0.6)]">
-              <div className="absolute top-0 right-0 p-16 opacity-[0.03] group-hover/card:opacity-[0.1] transition-all duration-1000 scale-150">
-                <svg className="w-64 h-64" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z"/></svg>
-              </div>
-              
-              <h2 className="text-4xl font-black mb-12 uppercase tracking-tighter">Onboard Infrastructure Staff</h2>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 mb-12">
-                <div className="space-y-4">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] ml-1">Assigned Username</label>
-                  <input className="w-full bg-white/5 border border-white/10 rounded-2xl px-8 py-6 focus:border-indigo-500 transition-all outline-none font-bold text-lg" placeholder="e.g. aditya_staff" value={newStaffUsername} onChange={e => setNewStaffUsername(e.target.value)} />
-                </div>
-                <div className="space-y-4">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] ml-1">Access Passphrase</label>
-                  <input className="w-full bg-white/5 border border-white/10 rounded-2xl px-8 py-6 focus:border-indigo-500 transition-all outline-none font-bold text-lg" type="password" placeholder="••••••••" value={newStaffPassword} onChange={e => setNewStaffPassword(e.target.value)} />
-                </div>
-                <div className="space-y-4">
-                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-[0.3em] ml-1">Assigned Role</label>
-                  <select 
-                    value={newStaffRole}
-                    onChange={(e) => setNewStaffRole(e.target.value as StaffRole)}
-                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-8 py-6 focus:border-indigo-500 transition-all outline-none font-bold text-lg appearance-none cursor-pointer"
-                  >
-                    {staffRoles.map(role => (
-                      <option key={role} value={role}>{role}</option>
-                    ))}
-                  </select>
-                </div>
+                {feedbacks.length > 0 && (
+                  <button onClick={onClearAllFeedback} className="px-8 py-4 bg-red-600/10 border border-red-500/20 text-red-500 rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-red-600 hover:text-white transition-all">Clear All History</button>
+                )}
               </div>
 
-              <div className="mb-16 space-y-8">
-                 <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] ml-1">Clearance Tier Configuration</h3>
-                 <div className="flex flex-wrap gap-5">
-                    {(['VAULT_VIEW', 'VAULT_EDIT', 'FEEDBACK_MANAGE'] as StaffPermission[]).map(perm => (
-                      <button 
-                        key={perm}
-                        onClick={() => togglePermission(perm)}
-                        className={`px-10 py-5 rounded-2xl text-[11px] font-black border transition-all uppercase tracking-widest ${newStaffPermissions.includes(perm) ? 'bg-indigo-600 border-indigo-500 text-white shadow-2xl shadow-indigo-600/40' : 'bg-white/5 border-white/10 text-slate-500 hover:text-white hover:bg-white/10'}`}
-                      >
-                        {perm.replace('_', ' ')}
-                      </button>
-                    ))}
-                 </div>
-              </div>
-
-              <button onClick={handleAddStaff} className="w-full py-7 bg-indigo-600 rounded-[2.5rem] font-black uppercase text-sm tracking-[0.3em] shadow-2xl shadow-indigo-600/40 transition-all active:scale-[0.98] flex items-center justify-center gap-5 hover:bg-indigo-500 hover:shadow-indigo-600/60">
-                {creationStatus === 'success' ? (
-                  <>
-                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M5 13l4 4L19 7" /></svg>
-                    Personnel Authorized
-                  </>
-                ) : 'Confirm New Authorization'}
-              </button>
-            </div>
-
-            {/* Live Personnel Roster with Sorting and Filtering */}
-            <div className="space-y-10">
-               <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 px-6">
-                  <div>
-                    <h3 className="text-[11px] font-black text-slate-500 uppercase tracking-[0.5em] mb-2">Active Personnel Roster</h3>
-                    <div className="flex items-center gap-3">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                      <span className="text-[11px] font-black text-slate-700 uppercase tracking-widest">{processedStaff.length} ENCRYPTED ENTITIES</span>
-                    </div>
+              <div className="space-y-4">
+                {feedbacks.length === 0 ? (
+                  <div className={`glass p-20 rounded-[3rem] text-center border opacity-40 ${theme === 'light' ? 'bg-white border-slate-200' : 'border-white/5'}`}>
+                    <p className="text-[10px] font-black uppercase tracking-[0.4em]">No signals received from community nodes.</p>
                   </div>
-
-                  <div className="flex flex-wrap items-center gap-4">
-                    {/* Filter Dropdown */}
-                    <div className="flex flex-col gap-2">
-                      <label className="text-[8px] font-black text-slate-600 uppercase tracking-widest ml-1">Filter by Permission</label>
-                      <select 
-                        value={filterBy}
-                        onChange={(e) => setFilterBy(e.target.value as FilterOption)}
-                        className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[10px] font-black uppercase tracking-widest outline-none focus:border-indigo-500 transition-all cursor-pointer"
-                      >
-                        <option value="ALL">All Personnel</option>
-                        <option value="VAULT_VIEW">Vault Viewers</option>
-                        <option value="VAULT_EDIT">Vault Editors</option>
-                        <option value="FEEDBACK_MANAGE">Feedback Ops</option>
-                      </select>
-                    </div>
-
-                    {/* Sort Dropdown */}
-                    <div className="flex flex-col gap-2">
-                      <label className="text-[8px] font-black text-slate-600 uppercase tracking-widest ml-1">Sort Roster By</label>
-                      <select 
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value as SortOption)}
-                        className="bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-[10px] font-black uppercase tracking-widest outline-none focus:border-indigo-500 transition-all cursor-pointer"
-                      >
-                        <option value="username">Identifier (A-Z)</option>
-                        <option value="role">Clearance Level</option>
-                        <option value="permissionsCount">Clearance Density</option>
-                      </select>
-                    </div>
-                  </div>
-               </div>
-               
-               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                 {processedStaff.map(s => (
-                   <div key={s.id} className="glass p-10 rounded-[3rem] border-white/5 flex items-center justify-between group hover:border-white/10 transition-all hover:-translate-y-2">
-                     <div className="flex items-center gap-8">
-                        <div className="w-20 h-20 rounded-[2rem] bg-indigo-600/10 border border-indigo-500/20 flex items-center justify-center font-black text-3xl text-indigo-400 shadow-inner">
-                          {s.username.charAt(0).toUpperCase()}
+                ) : (
+                  feedbacks.map(f => (
+                    <div key={f.id} className={`glass p-8 rounded-3xl border flex flex-col sm:flex-row justify-between items-start group hover:border-indigo-500/30 transition-all gap-4 ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'border-white/5'}`}>
+                      <div className="flex gap-6">
+                        <div className={`w-12 h-12 rounded-2xl shrink-0 flex items-center justify-center text-xl ${f.type === 'BUG' ? 'bg-red-500/20 text-red-400' : 'bg-emerald-500/20 text-emerald-400'}`}>
+                          {f.type === 'BUG' ? '🐞' : '💡'}
                         </div>
                         <div>
-                          <p className="font-black text-2xl mb-2 tracking-tighter">{s.username}</p>
-                          <div className="flex gap-3 flex-wrap">
-                            {s.permissions?.map(p => (
-                              <span key={p} className="text-[8px] font-black bg-indigo-600/10 px-3 py-1.5 rounded-xl text-indigo-400 border border-indigo-500/10 uppercase tracking-widest">
-                                {p.split('_')[0]}
+                          <p className={`font-medium mb-3 ${theme === 'light' ? 'text-slate-700' : 'text-slate-300'}`}>{f.message}</p>
+                          <div className="flex flex-wrap items-center gap-4 text-[9px] font-black uppercase tracking-widest text-slate-500">
+                            <span>Type: <span className={f.type === 'BUG' ? 'text-red-400' : 'text-emerald-400'}>{f.type}</span></span>
+                            <span>•</span>
+                            <span>{new Date(f.timestamp).toLocaleString()}</span>
+                          </div>
+                        </div>
+                      </div>
+                      <button onClick={() => onDeleteFeedback(f.id)} className="p-3 sm:opacity-0 group-hover:opacity-100 text-slate-500 hover:text-red-500 transition-all self-end sm:self-auto"><svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg></button>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'staff' && user?.isMaster && (
+            <div className="space-y-8 reveal active reveal-right">
+              <div className="mb-12">
+                <h2 className={`text-4xl font-black uppercase tracking-tighter mb-2 ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>Staff <span className="text-indigo-500">Roster</span></h2>
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-500">System Owner only access for personnel authorization</p>
+              </div>
+
+              {/* Add/Edit Staff Form */}
+              <div className={`glass p-10 rounded-[3rem] border mb-12 relative overflow-hidden ${theme === 'light' ? 'bg-white border-slate-200 shadow-xl' : 'border-white/10'}`}>
+                {creationStatus === 'success' && <div className="absolute top-0 left-0 w-full p-2 bg-emerald-500 text-black text-center font-black text-[10px] uppercase tracking-widest">New Operator Provisioned Successfully</div>}
+                {creationStatus === 'updated' && <div className="absolute top-0 left-0 w-full p-2 bg-indigo-500 text-white text-center font-black text-[10px] uppercase tracking-widest">Operator Signature Updated</div>}
+                
+                <h3 className="text-xs font-black uppercase tracking-widest mb-8 text-indigo-400">{editingStaffId ? 'Update Operator Record' : 'Authorize New Operator'}</h3>
+                
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">Operator ID (Username)</label>
+                    <input 
+                      value={newStaffUsername} 
+                      onChange={e => setNewStaffUsername(e.target.value)} 
+                      className={inputClasses} 
+                      placeholder="e.g., Nexus_01"
+                    />
+                  </div>
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">Digital Signature (Password)</label>
+                    <input 
+                      type="text"
+                      value={newStaffPassword} 
+                      onChange={e => setNewStaffPassword(e.target.value)} 
+                      className={inputClasses} 
+                      placeholder="Access Key"
+                    />
+                  </div>
+                </div>
+
+                <div className="mb-8 space-y-3">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">Assigned Personnel Role</label>
+                  <div className="flex flex-wrap gap-2">
+                    {staffRoles.map(role => (
+                      <button
+                        key={role}
+                        onClick={() => setNewStaffRole(role)}
+                        className={`px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all ${newStaffRole === role ? 'bg-indigo-600 text-white border-indigo-500' : theme === 'light' ? 'bg-slate-50 text-slate-400 border-slate-200 hover:bg-slate-100' : 'bg-white/5 text-slate-400 border-white/10 hover:bg-white/10'}`}
+                      >
+                        {role}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="mb-10 space-y-4">
+                  <label className="text-[10px] font-black text-slate-500 uppercase tracking-widest ml-2">Security Clearance Matrix (Permissions)</label>
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {PERMISSION_OPTS.map(opt => (
+                      <div 
+                        key={opt.id}
+                        onClick={() => handleTogglePermission(opt.id)}
+                        className={`p-6 rounded-2xl border cursor-pointer transition-all ${newStaffPermissions.includes(opt.id) ? 'bg-indigo-600/10 border-indigo-500/40 text-white' : theme === 'light' ? 'bg-slate-50 border-slate-200' : 'bg-white/5 border-white/5 text-slate-500'}`}
+                      >
+                        <div className="flex items-center gap-3 mb-2">
+                          <div className={`w-4 h-4 rounded border flex items-center justify-center transition-all ${newStaffPermissions.includes(opt.id) ? 'bg-indigo-500 border-indigo-500' : 'border-white/20'}`}>
+                            {newStaffPermissions.includes(opt.id) && <svg className="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={4} d="M5 13l4 4L19 7" /></svg>}
+                          </div>
+                          <span className={`text-[11px] font-black uppercase tracking-widest ${newStaffPermissions.includes(opt.id) ? (theme === 'light' ? 'text-indigo-600' : 'text-white') : 'text-slate-500'}`}>{opt.label}</span>
+                        </div>
+                        <p className="text-[9px] leading-relaxed opacity-60">{opt.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <button onClick={handleAddOrUpdateStaff} className="px-12 py-5 bg-indigo-600 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-indigo-500 transition-all shadow-xl shadow-indigo-600/20">
+                    {editingStaffId ? 'Confirm Record Update' : 'Provision Operator'}
+                  </button>
+                  {editingStaffId && <button onClick={resetStaffForm} className={`px-10 py-5 rounded-2xl text-[10px] font-black uppercase tracking-widest transition-all ${theme === 'light' ? 'bg-slate-200 text-slate-600 hover:bg-slate-300' : 'glass hover:bg-white/10'}`}>Abort Edit</button>}
+                </div>
+              </div>
+
+              {/* Staff Roster List */}
+              <div className="space-y-4">
+                <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] mb-4 ml-2">Active Personnel Records</h3>
+                {staffAccounts.length === 0 ? (
+                  <div className={`glass p-16 rounded-[2.5rem] text-center border-dashed border opacity-30 ${theme === 'light' ? 'bg-white border-slate-200' : 'border-white/10'}`}>
+                    <p className="text-[10px] font-black uppercase tracking-widest">No remote operators registered.</p>
+                  </div>
+                ) : (
+                  staffAccounts.map(staff => (
+                    <div key={staff.id} className={`glass p-8 rounded-3xl border flex flex-col md:flex-row justify-between items-center group transition-all gap-6 ${theme === 'light' ? 'bg-white border-slate-200 shadow-sm' : 'border-white/5 hover:border-indigo-500/30'}`}>
+                      <div className="flex items-center gap-6 w-full">
+                        <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black transition-all shrink-0 ${theme === 'light' ? 'bg-indigo-600 text-white' : 'bg-indigo-600/20 text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white'}`}>{staff.username.charAt(0)}</div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-1">
+                             <h4 className={`text-xl font-black ${theme === 'light' ? 'text-slate-900' : 'text-white'}`}>{staff.username}</h4>
+                             <span className={`px-3 py-0.5 rounded-lg border text-[9px] font-black uppercase tracking-widest ${theme === 'light' ? 'bg-slate-50 border-slate-200 text-slate-500' : 'bg-white/5 border-white/10 text-slate-400'}`}>{staff.role}</span>
+                          </div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            {staff.permissions.map(p => (
+                              <span key={p} className={`text-[8px] font-black uppercase tracking-tighter px-2 py-0.5 rounded border ${theme === 'light' ? 'bg-indigo-50 border-indigo-100 text-indigo-600' : 'bg-indigo-500/10 text-indigo-400 border-indigo-500/10'}`}>
+                                {PERMISSION_OPTS.find(o => o.id === p)?.label || p}
                               </span>
                             ))}
+                            {staff.permissions.length === 0 && <span className="text-[8px] font-black text-red-500">NO PERMISSIONS</span>}
                           </div>
-                          <p className="text-[8px] font-black text-slate-600 uppercase tracking-widest mt-3">Level: {s.role}</p>
                         </div>
-                     </div>
-                     <button onClick={() => setDeleteConfirmId(s.id)} className="w-14 h-14 flex items-center justify-center rounded-3xl text-slate-600 hover:text-red-500 hover:bg-red-500/10 transition-all active:scale-90" title="Purge Account">
-                        <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
-                     </button>
-                   </div>
-                 ))}
-               </div>
-               
-               {processedStaff.length === 0 && (
-                 <div className="text-center py-32 opacity-20 text-[11px] font-black uppercase tracking-[0.5em] border-2 border-dashed border-white/5 rounded-[4rem]">
-                    Personnel buffer is currently empty for this configuration
-                 </div>
-               )}
+                      </div>
+                      <div className="flex items-center gap-2 md:opacity-0 group-hover:opacity-100 transition-all">
+                        <button onClick={() => startEditStaff(staff)} className={`p-4 rounded-xl transition-all ${theme === 'light' ? 'hover:bg-slate-100 text-slate-400 hover:text-indigo-600' : 'hover:bg-white/5 text-slate-500 hover:text-indigo-400'}`} title="Rename/Edit">
+                          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-5M18.364 5.364l-1.06 1.06m0 0l-1.061-1.06m1.06 1.06l1.06 1.06m-1.06-1.06l1.061 1.06M15 7l3 3" /></svg>
+                        </button>
+                        <button onClick={() => deleteStaff(staff.id)} className={`p-4 rounded-xl transition-all ${theme === 'light' ? 'hover:bg-slate-100 text-slate-400 hover:text-red-500' : 'hover:bg-white/5 text-slate-500 hover:text-red-500'}`} title="Delete Operator">
+                          <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                        </button>
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
